@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign In | Retro Clurix Miners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050a18;--surface:#0e1525;--surface2:#151f32;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#f0c040;--gold-glow:rgba(240,192,64,0.12);
+  --green:#1fd98a;--red:#f05565;
+  --text:#e2e6f0;--text2:#8892aa;--text3:#4a5468;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{height:100%}
+body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font-body);display:flex;overflow:hidden}
+
+/* Brand panel */
+.brand-panel{width:44%;min-width:420px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:48px;position:relative;overflow:hidden}
+.brand-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 30% 50%,rgba(240,192,64,.07),transparent 65%);pointer-events:none}
+.brand-panel::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.brand-logo{font-family:var(--font-head);font-size:22px;font-weight:800;letter-spacing:-.5px;position:relative;z-index:1;text-decoration:none;color:var(--text)}
+.brand-logo span{color:var(--gold)}
+.brand-center{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}
+.brand-headline{font-family:var(--font-head);font-size:clamp(32px,3.5vw,50px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:20px}
+.brand-headline em{color:var(--gold);font-style:normal}
+.brand-sub{color:var(--text2);font-size:15px;line-height:1.7;max-width:340px;margin-bottom:40px}
+.stat-row{display:flex;gap:14px;flex-wrap:wrap}
+.stat-chip{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
+.stat-chip .val{font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--gold)}
+.stat-chip .lbl{font-size:11px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+.brand-footer{position:relative;z-index:1}
+.brand-footer p{font-size:12px;color:var(--text3);line-height:1.6}
+
+/* Ticker */
+.ticker-strip{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 0;margin:28px 0;position:relative;z-index:1}
+.ticker-inner{display:flex;gap:32px;animation:tick 22s linear infinite;white-space:nowrap;width:max-content}
+.tick-item{display:flex;gap:7px;font-size:12px;align-items:center}
+.tick-sym{font-family:var(--font-mono);font-weight:600;font-size:11px}
+.up{color:var(--green)}.dn{color:var(--red)}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* Form panel */
+.form-panel{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 32px;overflow-y:auto}
+.form-box{width:100%;max-width:420px}
+.form-top{margin-bottom:32px}
+.form-top h1{font-family:var(--font-head);font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+.form-top p{color:var(--text2);font-size:14px}
+.form-top p a{color:var(--gold);font-weight:600}
+
+.api-error{background:rgba(240,85,101,.1);border:1px solid rgba(240,85,101,.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
+.api-error.show{display:block}
+.api-success{background:rgba(31,217,138,.08);border:1px solid rgba(31,217,138,.2);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--green);margin-bottom:16px;display:none}
+.api-success.show{display:block}
+
+.social-btns{display:flex;gap:10px;margin-bottom:22px}
+.social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font-body)}
+.social-btn:hover{border-color:rgba(240,192,64,.3);background:var(--gold-glow)}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.divider span{font-size:12px;color:var(--text3);white-space:nowrap}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);font-weight:700;margin-bottom:7px}
+.field-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.field-row label{margin:0}
+.field-wrap{position:relative}
+.field input{width:100%;padding:13px 44px 13px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(240,192,64,.08)}
+.field input::placeholder{color:var(--text3)}
+.field-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:16px;cursor:pointer;color:var(--text3)}
+.field-error{font-size:12px;color:var(--red);margin-top:5px;display:none}
+.field.error input{border-color:var(--red)}
+.field.error .field-error{display:block}
+.forgot{font-size:12px;color:var(--gold);font-weight:600;text-decoration:none}
+.forgot:hover{text-decoration:underline}
+
+.check-row{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+.check-row label{font-size:13px;color:var(--text2);cursor:pointer}
+
+.btn-submit{width:100%;padding:14px;border-radius:9px;border:none;background:var(--gold);color:#0a0a0a;font-family:var(--font-head);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-submit:hover:not(:disabled){background:#ffd560;transform:translateY(-1px);box-shadow:0 8px 24px rgba(240,192,64,.3)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.spinner{width:18px;height:18px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.form-footer{text-align:center;margin-top:20px;font-size:13px;color:var(--text2)}
+.form-footer a{color:var(--gold);font-weight:600}
+
+/* Views */
+.view{display:none}
+.view.active{display:block}
+
+/* Forgot password OTP boxes */
+.otp-row{display:flex;gap:8px;justify-content:center;margin:20px 0}
+.otp-box{width:46px;height:54px;text-align:center;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:22px;font-weight:700;outline:none;transition:border-color .2s}
+.otp-box:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(240,192,64,.1)}
+.otp-box.filled{border-color:rgba(31,217,138,.4)}
+
+/* Success */
+.success-box{text-align:center;padding:24px 0}
+.success-check{width:72px;height:72px;border-radius:50%;background:rgba(31,217,138,.1);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popIn{from{scale:0;opacity:0}to{scale:1;opacity:1}}
+
+@media(max-width:860px){.brand-panel{display:none}.form-panel{padding:32px 20px}}
+</style>
+  <style>
+
+    /* ═══════════════════════════════════════════════════════
+       RCM  —  Unified Navigation  (injected)
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      --nav-h: 68px;
+      --bg:        #050a18;
+      --surface:   #0c1428;
+      --border:    rgba(255,255,255,0.08);
+      --gold:      #f0c040;
+      --gold-dim:  #c89e20;
+      --text:      #e8eaf0;
+      --muted:     #7b8299;
+      --green:     #22d98a;
+      --red:       #f05a5a;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius:    12px;
+    }
+
+    /* ── Google Fonts  ──────────────────────────────────── */
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+    /* ── Base header  ──────────────────────────────────── */
+    header.rcm-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      height: var(--nav-h);
+      background: rgba(5,10,24,0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      transition: background .3s;
+    }
+    header.rcm-header.scrolled { background: rgba(5,10,24,0.98); }
+
+    .rcm-nav {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    /* ── Logo ──────────────────────────────────────────── */
+    .rcm-logo {
+      font-family: var(--font-head);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .rcm-logo span { color: var(--gold); }
+
+    /* ── Desktop links ─────────────────────────────────── */
+    .rcm-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+    .rcm-links > li > a {
+      display: block;
+      padding: 8px 13px;
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+      white-space: nowrap;
+    }
+    .rcm-links > li > a:hover,
+    .rcm-links > li.active > a { color: var(--text); background: rgba(255,255,255,.06); }
+
+    /* ── Dropdown ──────────────────────────────────────── */
+    .rcm-drop { position: relative; }
+    .rcm-drop > a::after { content: ' ▾'; font-size: 10px; opacity: .6; }
+
+    .rcm-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 0;
+      list-style: none;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      z-index: 10000;
+    }
+    .rcm-dropdown li a {
+      display: block;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+    }
+    .rcm-dropdown li a:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .rcm-drop:hover .rcm-dropdown { display: block; }
+
+    /* ── Actions ───────────────────────────────────────── */
+    .rcm-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .rcm-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .rcm-btn-ghost {
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+    }
+    .rcm-btn-ghost:hover { background: rgba(255,255,255,.13); }
+    .rcm-btn-primary {
+      background: var(--gold);
+      color: #0a0a0a;
+    }
+    .rcm-btn-primary:hover { background: #ffd560; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(240,192,64,.28); }
+
+    /* ── Burger ────────────────────────────────────────── */
+    .rcm-burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+    .rcm-burger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform .3s, opacity .3s, width .3s;
+    }
+    /* X animation */
+    .rcm-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .rcm-burger.open span:nth-child(2) { opacity: 0; width: 0; }
+    .rcm-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile drawer ─────────────────────────────────── */
+    .rcm-mobile {
+      display: none;
+      position: fixed;
+      inset: var(--nav-h) 0 0 0;
+      background: var(--bg);
+      z-index: 9998;
+      overflow-y: auto;
+      padding: 20px 20px 32px;
+      flex-direction: column;
+      gap: 0;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    .rcm-mobile.open {
+      display: flex;
+      transform: translateX(0);
+    }
+
+    /* accordion sections */
+    .rcm-mob-section { border-bottom: 1px solid var(--border); }
+    .rcm-mob-section summary {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+    .rcm-mob-section summary::-webkit-details-marker { display: none; }
+    .rcm-mob-section summary .chevron {
+      font-size: 12px;
+      opacity: .5;
+      transition: transform .25s;
+    }
+    .rcm-mob-section[open] summary .chevron { transform: rotate(180deg); }
+    .rcm-mob-section ul { list-style: none; padding: 4px 0 12px; margin: 0; }
+    .rcm-mob-section ul li a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .rcm-mob-section ul li a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+
+    .rcm-mob-plain {
+      display: block;
+      padding: 16px 0;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .rcm-mob-plain:hover { color: var(--gold); }
+
+    .rcm-mob-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .rcm-mob-actions .rcm-btn { justify-content: center; }
+
+    /* ── Responsive breakpoints ────────────────────────── */
+    @media (max-width: 960px) {
+      .rcm-links, .rcm-actions { display: none; }
+      .rcm-burger { display: flex; }
+    }
+    @media (max-width: 480px) {
+      .rcm-logo { font-size: 16px; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ═══ RCM Unified Nav ════════════════════════════════════ -->
+<header class="rcm-header" id="rcmHeader">
+  <nav class="rcm-nav">
+    <a href="index.html" class="rcm-logo">Retro Clurix <span>Miners</span></a>
+
+    <ul class="rcm-links">
+      <li class="rcm-drop">
+        <a href="#">Products</a>
+        <ul class="rcm-dropdown">
+          <li><a href="platform-1.html">Margin Trading</a></li>
+          <li><a href="covesting-1.html">Copy-Trading</a></li>
+          <li><a href="buy-crypto.html">Buy Crypto</a></li>
+          <li><a href="contests.html">Trading Contests</a></li>
+          <li><a href="trading-academy.html">Academy</a></li>
+        </ul>
+      </li>
+      <li class="rcm-drop">
+        <a href="#">Markets</a>
+        <ul class="rcm-dropdown">
+          <li><a href="cryptocurrency-margin-trading-1.html">Cryptocurrencies</a></li>
+          <li><a href="forex-trading-1.html">Forex</a></li>
+          <li><a href="commodities-trading-1.html">Commodities</a></li>
+          <li><a href="gold-trading-1.html">Gold Trading</a></li>
+          <li><a href="index-trading-1.html">Stock Indices</a></li>
+          <li><a href="leverage-trading-crypto-indices-forex-1.html">All Instruments</a></li>
+        </ul>
+      </li>
+      <li class="rcm-drop">
+        <a href="#">Company</a>
+        <ul class="rcm-dropdown">
+          <li><a href="about-1.html">About Us</a></li>
+          <li><a href="security-1.html">Security</a></li>
+          <li><a href="fees-1.html">Fees</a></li>
+          <li><a href="press-and-media-1.html">Press &amp; Media</a></li>
+          <li><a href="index-5.html">Help Center</a></li>
+        </ul>
+      </li>
+      <li><a href="platform.html">Platform</a></li>
+      <li><a href="ambassador-1.html">Refer &amp; Earn</a></li>
+    </ul>
+
+    <div class="rcm-actions">
+      <a href="signin.html" class="rcm-btn rcm-btn-ghost">Login</a>
+      <a href="register.html" class="rcm-btn rcm-btn-primary">Register</a>
+    </div>
+
+    <button class="rcm-burger" id="rcmBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- ═══ Mobile Drawer ═══════════════════════════════════════ -->
+<div class="rcm-mobile" id="rcmMobile" role="dialog" aria-label="Navigation menu">
+  <details class="rcm-mob-section">
+    <summary>Products <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="platform-1.html">Margin Trading</a></li>
+      <li><a href="covesting-1.html">Copy-Trading</a></li>
+      <li><a href="buy-crypto.html">Buy Crypto</a></li>
+      <li><a href="contests.html">Trading Contests</a></li>
+      <li><a href="trading-academy.html">Academy</a></li>
+    </ul>
+  </details>
+  <details class="rcm-mob-section">
+    <summary>Markets <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="cryptocurrency-margin-trading-1.html">Cryptocurrencies</a></li>
+      <li><a href="forex-trading-1.html">Forex</a></li>
+      <li><a href="commodities-trading-1.html">Commodities</a></li>
+      <li><a href="gold-trading-1.html">Gold Trading</a></li>
+      <li><a href="index-trading-1.html">Stock Indices</a></li>
+      <li><a href="leverage-trading-crypto-indices-forex-1.html">All Instruments</a></li>
+    </ul>
+  </details>
+  <details class="rcm-mob-section">
+    <summary>Company <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="about-1.html">About Us</a></li>
+      <li><a href="security-1.html">Security</a></li>
+      <li><a href="fees-1.html">Fees</a></li>
+      <li><a href="press-and-media-1.html">Press &amp; Media</a></li>
+      <li><a href="index-5.html">Help Center</a></li>
+    </ul>
+  </details>
+  <a href="platform.html" class="rcm-mob-plain">Platform</a>
+  <a href="ambassador-1.html" class="rcm-mob-plain">Refer &amp; Earn</a>
+  <div class="rcm-mob-actions">
+    <a href="signin.html" class="rcm-btn rcm-btn-ghost">Login</a>
+    <a href="register.html" class="rcm-btn rcm-btn-primary">Register</a>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════════════════════ -->
+
+
+<!-- Brand side -->
+<div class="brand-panel">
+  <a href="../../../index.html" class="brand-logo">Retro Clurix <span>Miners</span></a>
+  <div class="brand-center">
+    <h2 class="brand-headline">Welcome<br>back, <em>trader.</em></h2>
+    <p class="brand-sub">Access your portfolio, open positions, and global markets — all in one place.</p>
+    <div class="ticker-strip">
+      <div class="ticker-inner">
+        <span class="tick-item"><span class="tick-sym">BTC</span><span>$67,420</span><span class="up">▲2.41%</span></span>
+        <span class="tick-item"><span class="tick-sym">ETH</span><span>$3,540</span><span class="up">▲1.82%</span></span>
+        <span class="tick-item"><span class="tick-sym">GOLD</span><span>$2,310</span><span class="up">▲0.32%</span></span>
+        <span class="tick-item"><span class="tick-sym">SP500</span><span>5,248</span><span class="up">▲0.72%</span></span>
+        <span class="tick-item"><span class="tick-sym">XRP</span><span>$0.612</span><span class="dn">▼0.52%</span></span>
+        <span class="tick-item"><span class="tick-sym">EUR/USD</span><span>1.0865</span><span class="up">▲0.12%</span></span>
+        <span class="tick-item"><span class="tick-sym">BTC</span><span>$67,420</span><span class="up">▲2.41%</span></span>
+        <span class="tick-item"><span class="tick-sym">ETH</span><span>$3,540</span><span class="up">▲1.82%</span></span>
+        <span class="tick-item"><span class="tick-sym">GOLD</span><span>$2,310</span><span class="up">▲0.32%</span></span>
+        <span class="tick-item"><span class="tick-sym">SP500</span><span>5,248</span><span class="up">▲0.72%</span></span>
+        <span class="tick-item"><span class="tick-sym">XRP</span><span>$0.612</span><span class="dn">▼0.52%</span></span>
+        <span class="tick-item"><span class="tick-sym">EUR/USD</span><span>1.0865</span><span class="up">▲0.12%</span></span>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-chip"><div class="val">1M+</div><div class="lbl">Traders</div></div>
+      <div class="stat-chip"><div class="val">152</div><div class="lbl">Countries</div></div>
+      <div class="stat-chip"><div class="val">$0</div><div class="lbl">Lost to Hacks</div></div>
+    </div>
+  </div>
+  <div class="brand-footer">
+    <p>By signing in you agree to our <a href="../../../fees-1.html" style="color:var(--gold)">Terms of Service</a> and <a href="../../../security-1.html" style="color:var(--gold)">Privacy Policy</a>.</p>
+  </div>
+</div>
+
+<!-- Form side -->
+<div class="form-panel">
+  <div class="form-box">
+
+    <!-- ── VIEW: Login ── -->
+    <div class="view active" id="viewLogin">
+      <div class="form-top">
+        <h1>Sign in</h1>
+        <p>Don't have an account? <a href="register.html">Create one free →</a></p>
+      </div>
+      <div class="api-error" id="loginErr"></div>
+
+      <div class="social-btns">
+        <button class="social-btn" onclick="socialLogin('Google',this)"><span>🔵</span> Google</button>
+        <button class="social-btn" onclick="socialLogin('Apple',this)"><span>🍎</span> Apple</button>
+      </div>
+      <div class="divider"><span>or sign in with email</span></div>
+
+      <div class="field" id="f-email">
+        <label>Email Address</label>
+        <div class="field-wrap">
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+          <span class="field-icon">✉️</span>
+        </div>
+        <div class="field-error">Please enter a valid email address.</div>
+      </div>
+
+      <div class="field" id="f-pass">
+        <div class="field-row">
+          <label>Password</label>
+          <a href="#" class="forgot" onclick="showView('viewForgot',event)">Forgot password?</a>
+        </div>
+        <div class="field-wrap">
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+          <span class="field-icon" id="togglePass" onclick="togglePassword()">👁️</span>
+        </div>
+        <div class="field-error">Password is required.</div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="remember" checked>
+        <label for="remember">Keep me signed in for 30 days</label>
+      </div>
+
+      <button class="btn-submit" id="loginBtn" onclick="doLogin()">
+        <span id="loginTxt">Sign In</span>
+        <div class="spinner" id="loginSpin"></div>
+      </button>
+      <div class="form-footer">New here? <a href="register.html">Create a free account</a></div>
+    </div>
+
+    <!-- ── VIEW: Forgot Password ── -->
+    <div class="view" id="viewForgot">
+      <div class="form-top">
+        <h1>Reset password</h1>
+        <p><a href="#" onclick="showView('viewLogin',event)">← Back to sign in</a></p>
+      </div>
+      <div class="api-error"   id="forgotErr"></div>
+      <div class="api-success" id="forgotOk"></div>
+
+      <div class="field" id="f-resetEmail">
+        <label>Email Address</label>
+        <div class="field-wrap">
+          <input type="email" id="resetEmail" placeholder="you@example.com">
+          <span class="field-icon">✉️</span>
+        </div>
+        <div class="field-error">Please enter a valid email address.</div>
+      </div>
+
+      <button class="btn-submit" id="forgotBtn" onclick="doForgot()">
+        <span id="forgotTxt">Send Reset Code</span>
+        <div class="spinner" id="forgotSpin"></div>
+      </button>
+    </div>
+
+    <!-- ── VIEW: Reset OTP ── -->
+    <div class="view" id="viewResetOtp">
+      <div class="form-top">
+        <h1>Enter reset code</h1>
+        <p>We sent a 6-digit code to <strong id="resetEmailDisplay" style="color:var(--gold)"></strong></p>
+      </div>
+      <div class="api-error" id="otpErr"></div>
+      <div class="otp-row" id="resetOtpRow">
+        <input class="otp-box" maxlength="1" oninput="rotpIn(this,0)" onkeydown="rotpKey(this,0,event)">
+        <input class="otp-box" maxlength="1" oninput="rotpIn(this,1)" onkeydown="rotpKey(this,1,event)">
+        <input class="otp-box" maxlength="1" oninput="rotpIn(this,2)" onkeydown="rotpKey(this,2,event)">
+        <input class="otp-box" maxlength="1" oninput="rotpIn(this,3)" onkeydown="rotpKey(this,3,event)">
+        <input class="otp-box" maxlength="1" oninput="rotpIn(this,4)" onkeydown="rotpKey(this,4,event)">
+        <input class="otp-box" maxlength="1" oninput="rotpIn(this,5)" onkeydown="rotpKey(this,5,event)">
+      </div>
+      <button class="btn-submit" id="otpBtn" onclick="doVerifyReset()">
+        <span id="otpTxt">Verify Code</span>
+        <div class="spinner" id="otpSpin"></div>
+      </button>
+    </div>
+
+    <!-- ── VIEW: New Password ── -->
+    <div class="view" id="viewNewPass">
+      <div class="form-top">
+        <h1>New password</h1>
+        <p style="color:var(--text2);font-size:14px">Choose a strong password for your account.</p>
+      </div>
+      <div class="api-error" id="newPassErr"></div>
+      <div class="field" id="f-newPass">
+        <label>New Password</label>
+        <div class="field-wrap">
+          <input type="password" id="newPass" placeholder="Min. 8 characters, 1 uppercase, 1 number">
+          <span class="field-icon" onclick="togglePass2()">👁️</span>
+        </div>
+        <div class="field-error">Min. 8 chars, 1 uppercase, 1 number.</div>
+      </div>
+      <div class="field" id="f-newConfirm">
+        <label>Confirm Password</label>
+        <div class="field-wrap">
+          <input type="password" id="newConfirm" placeholder="Repeat new password">
+        </div>
+        <div class="field-error">Passwords do not match.</div>
+      </div>
+      <button class="btn-submit" id="newPassBtn" onclick="doNewPass()">
+        <span id="newPassTxt">Update Password</span>
+        <div class="spinner" id="newPassSpin"></div>
+      </button>
+    </div>
+
+    <!-- ── VIEW: Success ── -->
+    <div class="view" id="viewSuccess">
+      <div class="success-box">
+        <div class="success-check">✓</div>
+        <h2 style="font-family:var(--font-head);font-size:24px;font-weight:800;margin-bottom:8px" id="successTitle">Welcome back!</h2>
+        <p style="color:var(--text2);font-size:14px;margin-bottom:24px" id="successMsg">Redirecting to your dashboard...</p>
+        <div style="width:100%;height:4px;background:var(--surface);border-radius:99px;overflow:hidden">
+          <div id="progressBar" style="height:100%;width:0;background:var(--gold);border-radius:99px;transition:width 2s ease"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Auto-detect API path — works in any subfolder (localhost/out/ or live root)
+const API_BASE = window.location.pathname.replace(/\/[^\/]*$/, '') + '/api';
+
+// ── State ────────────────────────────────────────────────────
+let resetToken    = null; // returned after OTP verified for reset
+let resetEmailVal = '';
+
+// ── View switcher ─────────────────────────────────────────────
+function showView(id, e) {
+  if (e) e.preventDefault();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function setErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.classList.toggle('show', !!msg);
+}
+function setOk(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.classList.toggle('show', !!msg);
+}
+function setFieldErr(fId, show) { document.getElementById(fId).classList.toggle('error', show); }
+function setBusy(btnId, txtId, spinId, on) {
+  document.getElementById(btnId).disabled = on;
+  document.getElementById(txtId).style.display = on ? 'none' : 'inline';
+  document.getElementById(spinId).style.display = on ? 'block' : 'none';
+}
+function togglePassword() {
+  const i = document.getElementById('password');
+  i.type = i.type==='password'?'text':'password';
+  document.getElementById('togglePass').textContent = i.type==='password'?'👁️':'🙈';
+}
+function togglePass2() {
+  const i = document.getElementById('newPass');
+  i.type = i.type==='password'?'text':'password';
+}
+
+// ── Demo mode detection ───────────────────────────────────────
+// ── Login ─────────────────────────────────────────────────────
+async function doLogin() {
+  setErr('loginErr','');
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('password').value;
+  let ok = true;
+  setFieldErr('f-email', !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)); if (!email) ok=false;
+  setFieldErr('f-pass',  !pass); if (!pass) ok=false;
+  if (!ok) return;
+
+  setBusy('loginBtn','loginTxt','loginSpin', true);
+
+  // ── Real PHP API ───────────────────────────────────
+  try {
+    const res  = await fetch(`${API_BASE}/login.php`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password: pass }),
+    });
+    let data;
+    try {
+      data = await res.json();
+    } catch(_) {
+      // Server returned non-JSON (HTML error page, 500, etc.)
+      setErr('loginErr', `Server error (${res.status}). Please contact support if this persists.`);
+      setBusy('loginBtn','loginTxt','loginSpin', false);
+      return;
+    }
+    if (!data.success) {
+      setErr('loginErr', data.error || 'Login failed. Please try again.');
+      setBusy('loginBtn','loginTxt','loginSpin', false);
+      return;
+    }
+    localStorage.setItem('rcm_token', data.token);
+    localStorage.setItem('rcm_user',  JSON.stringify(data.user));
+    const isAdmin = data.user.role === 'admin';
+    document.getElementById('successTitle').textContent = `Welcome back, ${data.user.first_name}!`;
+    document.getElementById('successMsg').textContent   = isAdmin ? 'Redirecting to admin panel...' : 'Signing you into your dashboard now...';
+    showView('viewSuccess');
+    setTimeout(() => { document.getElementById('progressBar').style.width='100%'; }, 80);
+    setTimeout(() => { window.location.href = isAdmin ? 'admin.html' : 'dashboard.html'; }, 2200);
+  } catch(e) {
+    // fetch() itself failed — likely CORS, wrong path, or server is down
+    setErr('loginErr', `Could not reach server: ${e.message}. Check that /api/login.php exists.`);
+    setBusy('loginBtn','loginTxt','loginSpin', false);
+    console.error('Login fetch error:', e);
+  }
+}
+
+// ── Forgot password — step 1: send reset OTP ─────────────────
+async function doForgot() {
+  setErr('forgotErr',''); setOk('forgotOk','');
+  const email = document.getElementById('resetEmail').value.trim();
+  setFieldErr('f-resetEmail', !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+
+  setBusy('forgotBtn','forgotTxt','forgotSpin', true);
+
+  try {
+    const res  = await fetch(`${API_BASE}/forgot-password.php`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    // Always show success msg (don't reveal if email exists)
+    resetEmailVal = email;
+    document.getElementById('resetEmailDisplay').textContent = email;
+    setBusy('forgotBtn','forgotTxt','forgotSpin', false);
+    showView('viewResetOtp');
+    setTimeout(() => document.querySelectorAll('#resetOtpRow .otp-box')[0].focus(), 100);
+  } catch(e) {
+    setErr('forgotErr','Network error. Please try again.');
+    setBusy('forgotBtn','forgotTxt','forgotSpin', false);
+  }
+}
+
+// ── Reset OTP boxes ───────────────────────────────────────────
+function rotpIn(el, idx) {
+  el.value = el.value.replace(/[^0-9]/g,'');
+  el.classList.toggle('filled', !!el.value);
+  if (el.value && idx < 5) document.querySelectorAll('#resetOtpRow .otp-box')[idx+1].focus();
+  const full = [...document.querySelectorAll('#resetOtpRow .otp-box')].map(b=>b.value).join('');
+  if (full.length===6) setTimeout(doVerifyReset, 200);
+}
+function rotpKey(el, idx, e) {
+  if (e.key==='Backspace' && !el.value && idx>0) {
+    const p = document.querySelectorAll('#resetOtpRow .otp-box')[idx-1];
+    p.value=''; p.classList.remove('filled'); p.focus();
+  }
+}
+
+async function doVerifyReset() {
+  setErr('otpErr','');
+  const otp = [...document.querySelectorAll('#resetOtpRow .otp-box')].map(b=>b.value).join('');
+  if (otp.length<6) return;
+  setBusy('otpBtn','otpTxt','otpSpin', true);
+  try {
+    const res  = await fetch(`${API_BASE}/verify-reset-otp.php`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email: resetEmailVal, otp }),
+    });
+    const data = await res.json();
+    if (!data.success) {
+      setErr('otpErr', data.error || 'Invalid code. Try again.');
+      document.querySelectorAll('#resetOtpRow .otp-box').forEach(b=>{b.value='';b.classList.remove('filled');});
+      document.querySelectorAll('#resetOtpRow .otp-box')[0].focus();
+      setBusy('otpBtn','otpTxt','otpSpin', false);
+      return;
+    }
+    resetToken = data.reset_token;
+    setBusy('otpBtn','otpTxt','otpSpin', false);
+    showView('viewNewPass');
+  } catch(e) {
+    setErr('otpErr','Network error. Please try again.');
+    setBusy('otpBtn','otpTxt','otpSpin', false);
+  }
+}
+
+// ── New password ──────────────────────────────────────────────
+async function doNewPass() {
+  setErr('newPassErr','');
+  const p1 = document.getElementById('newPass').value;
+  const p2 = document.getElementById('newConfirm').value;
+  let ok = true;
+  setFieldErr('f-newPass',    p1.length<8||!/[A-Z]/.test(p1)||!/[0-9]/.test(p1)); if(p1.length<8)ok=false;
+  setFieldErr('f-newConfirm', p1!==p2); if(p1!==p2)ok=false;
+  if (!ok) return;
+
+  setBusy('newPassBtn','newPassTxt','newPassSpin', true);
+
+  try {
+    const res  = await fetch(`${API_BASE}/reset-password.php`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ reset_token: resetToken, password: p1 }),
+    });
+    const data = await res.json();
+    if (!data.success) {
+      setErr('newPassErr', data.error||'Could not update password. Please try again.');
+      setBusy('newPassBtn','newPassTxt','newPassSpin', false);
+      return;
+    }
+    document.getElementById('successTitle').textContent = 'Password updated!';
+    document.getElementById('successMsg').textContent   = 'Your password has been reset. Redirecting to sign in...';
+    showView('viewSuccess');
+    setTimeout(() => { document.getElementById('progressBar').style.width='100%'; }, 80);
+    setTimeout(() => showView('viewLogin'), 2400);
+  } catch(e) {
+    setErr('newPassErr','Network error. Please try again.');
+    setBusy('newPassBtn','newPassTxt','newPassSpin', false);
+  }
+}
+
+// ── Social login (demo) ───────────────────────────────────────
+function socialLogin(provider, btn) {
+  btn.innerHTML = `Connecting ${provider}...`;
+  btn.style.opacity='0.6'; btn.style.pointerEvents='none';
+  setTimeout(() => {
+    // In production: redirect to OAuth flow
+    document.getElementById('email').value    = `demo@retroclurixminers.net`;
+    document.getElementById('password').value = `Demo1234!`;
+    btn.innerHTML = `<span>${provider==='Google'?'🔵':'🍎'}</span> ${provider}`;
+    btn.style.opacity=''; btn.style.pointerEvents='';
+    doLogin();
+  }, 900);
+}
+
+// ── Enter key ─────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = document.querySelector('.view.active').id;
+  if (active==='viewLogin')    doLogin();
+  if (active==='viewForgot')   doForgot();
+  if (active==='viewNewPass')  doNewPass();
+});
+
+// ── Auto-redirect if already logged in (clear stale demo tokens) ──
+window.addEventListener('load', () => {
+  const token = localStorage.getItem('rcm_token');
+  if (!token) return;
+  // Clear any leftover demo tokens from old sessions
+  if (token.startsWith('demo_token_')) {
+    localStorage.removeItem('rcm_token');
+    localStorage.removeItem('rcm_user');
+    return;
+  }
+  const u = JSON.parse(localStorage.getItem('rcm_user') || '{}');
+  window.location.href = u.role === 'admin' ? 'admin.html' : 'dashboard.html';
+});
+</script>
+
+<script>
+(function(){
+  /* ── Burger toggle ── */
+  var burger = document.getElementById('rcmBurger');
+  var mobile = document.getElementById('rcmMobile');
+  var header = document.getElementById('rcmHeader');
+  if(burger && mobile){
+    burger.addEventListener('click', function(){
+      var open = mobile.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    // Close on outside click
+    document.addEventListener('click', function(e){
+      if(mobile.classList.contains('open') && !mobile.contains(e.target) && !burger.contains(e.target)){
+        mobile.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+      }
+    });
+    // Close on nav link click
+    mobile.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        mobile.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+  /* ── Scroll shadow ── */
+  if(header){
+    window.addEventListener('scroll', function(){
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, {passive:true});
+  }
+  /* ── Active link highlight ── */
+  var page = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.rcm-links a, .rcm-mobile a').forEach(function(a){
+    if(a.getAttribute('href') === page) a.closest('li') && a.closest('li').classList.add('active');
+  });
+})();
+</script>
+
+</body>
+</html>

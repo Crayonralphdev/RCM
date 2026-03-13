@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retro Clurix Miners — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Theme Variables ─────────────────────────────── */
+:root {
+  --gold: #f0c040;
+  --gold-glow: rgba(240,192,64,0.18);
+  --green: #1fd98a;
+  --red: #f05565;
+  --blue: #3d9cf0;
+  --radius: 14px;
+  --font-head: 'Syne', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-body: 'DM Sans', sans-serif;
+  --transition: 0.32s cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"] {
+  --bg:       #07090f;
+  --bg2:      #0e1220;
+  --surface:  #131827;
+  --surface2: #1a2035;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --text:     #e2e6f0;
+  --text2:    #8892aa;
+  --text3:    #4a5468;
+  --shadow:   0 8px 32px rgba(0,0,0,0.5);
+  --invert:   0;
+}
+
+[data-theme="light"] {
+  --bg:       #f0f2f8;
+  --bg2:      #e4e8f2;
+  --surface:  #ffffff;
+  --surface2: #f5f7fd;
+  --border:   rgba(0,0,0,0.07);
+  --border2:  rgba(0,0,0,0.12);
+  --text:     #111827;
+  --text2:    #5a6478;
+  --text3:    #9aa0b0;
+  --shadow:   0 8px 32px rgba(0,0,0,0.1);
+  --invert:   1;
+}
+
+/* ── Reset ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  transition: background var(--transition), color var(--transition);
+  overflow: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+input, select { font-family: inherit; }
+
+/* ── Sidebar ─────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  transition: background var(--transition), width 0.3s;
+  z-index: 10;
+  position: relative;
+}
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-head);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.sidebar-logo span { color: var(--gold); }
+.sidebar-logo small {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text3);
+  margin-top: 2px;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+}
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text2);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active {
+  background: var(--gold-glow);
+  color: var(--gold);
+  font-weight: 600;
+}
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+  padding: 14px 12px 6px;
+  font-weight: 600;
+}
+.sidebar-bottom {
+  padding: 12px 10px;
+  border-top: 1px solid var(--border);
+}
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface2);
+}
+.user-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--gold-glow);
+  border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold);
+  font-family: var(--font-head);
+}
+.user-info strong { display: block; font-size: 13px; font-weight: 600; }
+.user-info small { color: var(--text2); font-size: 11px; }
+
+/* ── Main ────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── Topbar ──────────────────────────────────────── */
+.topbar {
+  height: 60px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+.topbar-title {
+  font-family: var(--font-head);
+  font-size: 16px;
+  font-weight: 700;
+}
+.topbar-spacer { flex: 1; }
+.ticker-mini {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  overflow: hidden;
+}
+.ticker-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.ticker-chip .sym { font-family: var(--font-mono); font-weight: 600; font-size: 11px; }
+.ticker-chip .pr  { font-family: var(--font-mono); }
+.up  { color: var(--green); }
+.dn  { color: var(--red); }
+
+/* theme toggle */
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.theme-toggle:hover { background: var(--border); }
+
+.notif-btn {
+  position: relative;
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.notif-dot {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+
+/* ── Content area ────────────────────────────────── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.panel { display: none; flex-direction: column; gap: 20px; }
+.panel.active { display: flex; }
+
+/* ── Cards ───────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: background var(--transition), border-color 0.15s;
+}
+.card:hover { border-color: var(--border2); }
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.card-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-weight: 600;
+}
+.badge-green { background: rgba(31,217,138,0.12); color: var(--green); }
+.badge-gold  { background: var(--gold-glow); color: var(--gold); }
+.badge-red   { background: rgba(240,85,101,0.12); color: var(--red); }
+
+/* ── Stats row ───────────────────────────────────── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  transition: background var(--transition);
+}
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+.stat-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Chart sparkline ─────────────────────────────── */
+.chart-area {
+  height: 80px;
+  position: relative;
+  margin-top: 4px;
+}
+canvas.sparkline { width: 100%; height: 100%; }
+
+/* ── Big equity chart ────────────────────────────── */
+.equity-chart-container {
+  height: 200px;
+  position: relative;
+}
+
+/* ── Two column ──────────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+/* ── Table ───────────────────────────────────────── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+.data-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--surface2); }
+.mono { font-family: var(--font-mono); font-size: 12px; }
+
+/* ── Watchlist ───────────────────────────────────── */
+.watchlist-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-radius: 6px;
+  padding: 10px 8px;
+}
+.watchlist-item:hover { background: var(--surface2); }
+.watchlist-item:last-child { border-bottom: none; }
+.asset-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.asset-info { flex: 1; min-width: 0; }
+.asset-name { font-weight: 600; font-size: 13px; }
+.asset-full { font-size: 11px; color: var(--text3); }
+.asset-price { text-align: right; }
+.asset-price .pr { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+.asset-price .chg { font-size: 11px; font-family: var(--font-mono); }
+.mini-spark { width: 60px; height: 28px; }
+
+/* ── Order panel ─────────────────────────────────── */
+.order-tabs { display: flex; gap: 2px; margin-bottom: 16px; background: var(--bg2); border-radius: 8px; padding: 3px; }
+.order-tab {
+  flex: 1; padding: 7px; border-radius: 6px; border: none;
+  font-family: var(--font-head); font-size: 13px; font-weight: 700;
+  background: none; color: var(--text2); transition: all 0.15s;
+}
+.order-tab.buy.active  { background: var(--green); color: #000; }
+.order-tab.sell.active { background: var(--red);   color: #fff; }
+
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
+.form-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--gold); }
+.form-select {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  outline: none;
+  appearance: none;
+}
+
+.leverage-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+.order-summary {
+  background: var(--bg2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.summary-row { display: flex; justify-content: space-between; font-size: 12px; }
+.summary-row span:first-child { color: var(--text2); }
+.summary-row span:last-child { font-family: var(--font-mono); font-weight: 600; }
+
+.btn-trade {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: none;
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+.btn-trade.buy  { background: var(--green); color: #000; }
+.btn-trade.sell { background: var(--red);   color: #fff; }
+.btn-trade:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* ── History ─────────────────────────────────────── */
+.filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 5px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.filter-chip.active { background: var(--gold-glow); border-color: var(--gold); color: var(--gold); }
+
+/* ── Deposit/Withdraw ────────────────────────────── */
+.method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.method-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.method-card:hover, .method-card.active { border-color: var(--gold); background: var(--gold-glow); }
+.method-card .m-icon { font-size: 22px; margin-bottom: 6px; }
+.method-card span { font-size: 11px; font-weight: 600; display: block; color: var(--text2); }
+
+.balance-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.balance-bar .bal-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+.balance-bar .bal-val { font-family: var(--font-mono); font-size: 20px; font-weight: 600; }
+
+.btn-action {
+  padding: 11px 20px;
+  border-radius: 8px;
+  border: none;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.btn-green { background: var(--green); color: #000; }
+.btn-red   { background: var(--red);   color: #fff; }
+.btn-gold  { background: var(--gold);  color: #000; }
+.btn-action:hover { opacity: 0.85; transform: translateY(-1px); }
+
+/* ── Toast ───────────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  display: flex; flex-direction: column; gap: 8px;
+  z-index: 999;
+}
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 13px;
+  box-shadow: var(--shadow);
+  animation: slideIn 0.3s ease, fadeOut 0.4s 2.6s ease forwards;
+  display: flex; align-items: center; gap: 10px;
+  max-width: 300px;
+}
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--red); }
+.toast.info    { border-left: 3px solid var(--gold); }
+@keyframes slideIn  { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+@keyframes fadeOut  { from { opacity:1; } to { opacity:0; pointer-events:none; } }
+
+/* ── P&L badge animate ───────────────────────────── */
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  display: inline-block;
+  animation: pulse 1.6s infinite;
+  margin-right: 4px;
+}
+
+/* ── Scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 1100px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .three-col { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 800px) {
+  .sidebar { width: 60px; min-width: 60px; }
+  .sidebar-logo, .nav-section-label, .nav-item span, .user-info { display: none; }
+  .nav-item { justify-content: center; }
+  .two-col, .three-col { grid-template-columns: 1fr; }
+}
+
+/* ── Toggle switch ───────────────────────────────── */
+.toggle-switch { position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0; }
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; cursor:pointer; inset:0; background:var(--surface2); border:1.5px solid var(--border2); border-radius:99px; transition:.3s; }
+.toggle-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:var(--text3); border-radius:50%; transition:.3s; }
+.toggle-switch input:checked + .toggle-slider { background:var(--gold-glow); border-color:rgba(240,192,64,.4); }
+.toggle-switch input:checked + .toggle-slider::before { transform:translateX(20px); background:var(--gold); }
+
+
+/* ── Mobile sidebar overlay ──────────────────────── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 9;
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.open { display: block; }
+
+/* ── Dashboard mobile hamburger ─────────────────── */
+.dash-burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  margin-right: 8px;
+}
+.dash-burger span {
+  display: block;
+  width: 22px; height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+.dash-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.dash-burger.open span:nth-child(2) { opacity: 0; }
+.dash-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 800px) {
+  .dash-burger { display: flex; }
+  .sidebar {
+    position: fixed !important;
+    left: -220px;
+    top: 0;
+    height: 100vh;
+    z-index: 10;
+    transition: left 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  .sidebar.mobile-open { left: 0; }
+  .sidebar-logo, .nav-section-label, .nav-item span, .user-info { display: flex !important; }
+  .sidebar-logo { display: block !important; }
+  .nav-section-label { display: block !important; }
+  .user-info { display: block !important; }
+  .sidebar { width: 220px !important; min-width: 220px !important; }
+  .nav-item { justify-content: flex-start !important; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Sidebar overlay for mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ── Sidebar ────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    Retro Clurix <span>Miners</span>
+    <small>Trading Dashboard</small>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Main</span>
+    <button class="nav-item active" onclick="showPanel('overview',this)">
+      <span class="icon">📊</span><span>Overview</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('trade',this)">
+      <span class="icon">⚡</span><span>Trade</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('watchlist',this)">
+      <span class="icon">👁️</span><span>Watchlist</span>
+    </button>
+    <span class="nav-section-label">Account</span>
+    <button class="nav-item" onclick="showPanel('history',this)">
+      <span class="icon">📋</span><span>History</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('deposit',this)">
+      <span class="icon">💳</span><span>Deposit / Withdraw</span>
+    </button>
+    <span class="nav-section-label">More</span>
+    <button class="nav-item" onclick="showPanel('settings',this)" id="nav-settings">
+      <span class="icon">⚙️</span><span>Settings</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('messages',this)">
+      <span class="icon">💬</span><span>Support / Messages</span>
+    </button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebarAvatar">…</div>
+      <div class="user-info">
+        <strong id="sidebarName">Loading…</strong>
+        <small id="sidebarRole">Account</small>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── Main ──────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <button class="dash-burger" id="dashBurger" aria-label="Open sidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="topbar-title" id="topbarTitle">Overview</div>
+    <div class="topbar-spacer"></div>
+    <div class="ticker-mini" id="topTicker"></div>
+    <button class="notif-btn" onclick="showToast('3 new alerts','info')">
+      🔔<span class="notif-dot"></span>
+    </button>
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ── OVERVIEW PANEL ──────────────────────────── -->
+    <div class="panel active" id="panel-overview">
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Balance</div>
+          <div class="stat-value" id="stat-balance">$0.00</div>
+          <div class="stat-sub up">▲ +$340.20 today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Unrealized P&L</div>
+          <div class="stat-value" id="stat-pnl">$0.00</div>
+          <div class="stat-sub up">▲ +5.25% open</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Available Margin</div>
+          <div class="stat-value" id="stat-margin">$0.00</div>
+          <div class="stat-sub" style="color:var(--text3)">73.8% free</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Trades</div>
+          <div class="stat-value">148</div>
+          <div class="stat-sub" style="color:var(--text3)">62% win rate</div>
+        </div>
+      </div>
+
+      <!-- Equity Chart + Positions -->
+      <div class="two-col">
+        <div class="card" style="grid-column: span 1">
+          <div class="card-header">
+            <span class="card-title">Portfolio Equity</span>
+            <span class="card-badge badge-green"><span class="live-dot"></span>Live</span>
+          </div>
+          <div class="equity-chart-container">
+            <canvas id="equityChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Open Positions</span>
+            <span class="card-badge badge-gold">3 Active</span>
+          </div>
+          <table class="data-table" id="positionsTable">
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Side</th>
+                <th>P&L</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Allocation donut + recent trades -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Asset Allocation</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:24px">
+            <canvas id="donutChart" width="130" height="130" style="flex-shrink:0"></canvas>
+            <div id="donutLegend" style="display:flex;flex-direction:column;gap:8px;font-size:12px;"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Trades</span>
+            <button class="filter-chip" onclick="showPanel('history',document.querySelector('[onclick*=history]'))">View all →</button>
+          </div>
+          <table class="data-table" id="recentTradesTable">
+            <thead><tr><th>Pair</th><th>Type</th><th>P&L</th><th>Time</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRADE PANEL ─────────────────────────────── -->
+    <div class="panel" id="panel-trade">
+      <div class="two-col" style="align-items:start">
+
+        <!-- Order form -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Place Order</span>
+          </div>
+          <div class="order-tabs">
+            <button class="order-tab buy active" onclick="setOrderSide('buy',this)">BUY / LONG</button>
+            <button class="order-tab sell" onclick="setOrderSide('sell',this)">SELL / SHORT</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Market</label>
+            <select class="form-select" id="orderMarket" onchange="updateOrderCalc()">
+              <option value="67420">BTC/USD — $67,420</option>
+              <option value="3540">ETH/USD — $3,540</option>
+              <option value="84.40">LTC/USD — $84.40</option>
+              <option value="0.612">XRP/USD — $0.612</option>
+              <option value="2310.50">GOLD — $2,310.50</option>
+              <option value="5248.80">SP500 — $5,248.80</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Amount (USD)</label>
+            <input type="number" class="form-input" id="orderAmount" value="500" min="10" oninput="updateOrderCalc()">
+          </div>
+
+          <div class="form-group">
+            <div class="leverage-row">
+              <span>Leverage</span>
+              <span id="leverageVal">10×</span>
+            </div>
+            <input type="range" id="leverageSlider" min="1" max="100" value="10"
+              oninput="document.getElementById('leverageVal').textContent=this.value+'×';updateOrderCalc()">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Stop Loss (USD)</label>
+            <input type="number" class="form-input" id="orderSL" placeholder="Optional">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Take Profit (USD)</label>
+            <input type="number" class="form-input" id="orderTP" placeholder="Optional">
+          </div>
+
+          <div class="order-summary" id="orderSummary"></div>
+          <button class="btn-trade buy" id="tradeBtn" onclick="placeOrder()">OPEN LONG POSITION</button>
+        </div>
+
+        <!-- Live chart area + watchlist -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title" id="tradeChartTitle">BTC/USD</span>
+              <span class="card-badge badge-green up" id="tradeChartPrice">$67,420.00</span>
+            </div>
+            <div style="height:220px;position:relative">
+              <canvas id="tradeChart"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Quick Watchlist</span></div>
+            <div id="tradeWatchlist"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WATCHLIST PANEL ─────────────────────────── -->
+    <div class="panel" id="panel-watchlist">
+      <div class="three-col" style="align-items:start">
+        <div class="card" style="grid-column:span 2">
+          <div class="card-header">
+            <span class="card-title">All Markets</span>
+            <div class="filter-row" style="margin:0">
+              <button class="filter-chip active" onclick="filterWatchlist('all',this)">All</button>
+              <button class="filter-chip" onclick="filterWatchlist('crypto',this)">Crypto</button>
+              <button class="filter-chip" onclick="filterWatchlist('forex',this)">Forex</button>
+              <button class="filter-chip" onclick="filterWatchlist('indices',this)">Indices</button>
+              <button class="filter-chip" onclick="filterWatchlist('commodities',this)">Commodities</button>
+            </div>
+          </div>
+          <div id="watchlistFull"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Top Movers</span></div>
+          <div id="topMovers"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORY PANEL ───────────────────────────── -->
+    <div class="panel" id="panel-history">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Trade History</span>
+          <span class="card-badge badge-gold" id="historyBadge">0 trades</span>
+        </div>
+        <div class="filter-row">
+          <button class="filter-chip active" onclick="filterHistory('all',this)">All</button>
+          <button class="filter-chip" onclick="filterHistory('buy',this)">Long</button>
+          <button class="filter-chip" onclick="filterHistory('sell',this)">Short</button>
+          <button class="filter-chip" onclick="filterHistory('win',this)">Winners</button>
+          <button class="filter-chip" onclick="filterHistory('loss',this)">Losers</button>
+        </div>
+        <table class="data-table" id="historyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Pair</th>
+              <th>Side</th>
+              <th>Entry</th>
+              <th>Exit</th>
+              <th>Size</th>
+              <th>P&L</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── DEPOSIT PANEL ───────────────────────────── -->
+    <div class="panel" id="panel-deposit">
+      <div class="two-col" style="align-items:start">
+
+        <!-- Deposit -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Deposit Funds</span>
+            <span class="card-badge badge-green">No Fees</span>
+          </div>
+          <div class="balance-bar">
+            <div><div class="bal-label">Current Balance</div><div class="bal-val" id="dep-balance">$0.00</div></div>
+            <span style="font-size:28px">💰</span>
+          </div>
+
+          <!-- STEP 1: Amount entry (always shown first) -->
+          <div id="depositStep1">
+            <div style="background:rgba(240,192,64,.07);border:1px solid rgba(240,192,64,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+              <strong style="color:var(--gold);display:block;margin-bottom:4px">Step 1 of 2 — Enter Amount</strong>
+              Please enter the amount you wish to deposit before selecting a payment method.
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deposit Amount (USD)</label>
+              <input type="number" class="form-input" id="depositAmountStep1" placeholder="Min $50" min="50" style="font-size:20px;padding:14px 16px;">
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+              <button onclick="setDepAmt(100)"  style="padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-weight:600;font-size:13px;cursor:pointer">$100</button>
+              <button onclick="setDepAmt(500)"  style="padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-weight:600;font-size:13px;cursor:pointer">$500</button>
+              <button onclick="setDepAmt(1000)" style="padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-weight:600;font-size:13px;cursor:pointer">$1,000</button>
+              <button onclick="setDepAmt(5000)" style="padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-weight:600;font-size:13px;cursor:pointer">$5,000</button>
+            </div>
+            <button class="btn-action btn-gold" style="width:100%;padding:13px;font-size:14px" onclick="proceedToPaymentMethod()">Continue to Payment Method →</button>
+          </div>
+
+          <!-- STEP 2: Payment Method (shown after amount entered) -->
+          <div id="depositStep2" style="display:none">
+            <div style="background:rgba(31,217,138,.07);border:1px solid rgba(31,217,138,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Deposit Amount</div>
+                <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--green)" id="depositAmountConfirm">$500.00</div>
+              </div>
+              <button onclick="goBackToStep1()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer">✏️ Edit</button>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Step 2 — Choose Payment Method</label>
+              <div class="method-grid">
+                <div class="method-card active" onclick="selectMethod(this,'btc')"><div class="m-icon">₿</div><span>Bitcoin</span></div>
+                <div class="method-card" onclick="selectMethod(this,'eth')"><div class="m-icon">Ξ</div><span>Ethereum</span></div>
+                <div class="method-card" onclick="selectMethod(this,'usdt')"><div class="m-icon">⚡</div><span>USDT</span></div>
+                <div class="method-card" onclick="selectMethod(this,'usdc')"><div class="m-icon">🔵</div><span>USDC</span></div>
+                <div class="method-card" onclick="selectMethod(this,'card')"><div class="m-icon">💳</div><span>Card</span></div>
+                <div class="method-card" onclick="selectMethod(this,'wire')"><div class="m-icon">🏦</div><span>Wire</span></div>
+              </div>
+            </div>
+
+            <!-- Crypto deposit box -->
+            <div id="cryptoDepositBox" class="form-group">
+              <label class="form-label">Send to this wallet address</label>
+              <div style="background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;padding:14px 16px;margin-bottom:10px">
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" id="depNetworkLabel">Bitcoin Network (BTC)</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div id="depWalletAddress" style="font-family:var(--font-mono);font-size:11px;color:var(--text);word-break:break-all;flex:1">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kjfjvz0lll</div>
+                  <button onclick="copyAddress()" id="copyBtn" style="background:var(--gold-glow);border:1px solid rgba(240,192,64,.3);color:var(--gold);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;cursor:pointer">Copy</button>
+                </div>
+              </div>
+              <div style="text-align:center;padding:12px 0">
+                <div style="display:inline-block;background:white;padding:10px;border-radius:10px">
+                  <svg width="100" height="100" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg"><rect width="21" height="21" fill="white"/><g fill="black"><rect x="0" y="0" width="7" height="7"/><rect x="1" y="1" width="5" height="5" fill="white"/><rect x="2" y="2" width="3" height="3"/><rect x="14" y="0" width="7" height="7"/><rect x="15" y="1" width="5" height="5" fill="white"/><rect x="16" y="2" width="3" height="3"/><rect x="0" y="14" width="7" height="7"/><rect x="1" y="15" width="5" height="5" fill="white"/><rect x="2" y="16" width="3" height="3"/><rect x="9" y="0" width="1" height="1"/><rect x="11" y="0" width="1" height="1"/><rect x="9" y="2" width="2" height="1"/><rect x="12" y="2" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="8" y="6" width="3" height="1"/><rect x="12" y="6" width="1" height="1"/><rect x="14" y="8" width="1" height="1"/><rect x="16" y="8" width="1" height="1"/><rect x="18" y="8" width="1" height="1"/><rect x="0" y="8" width="2" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="6" y="8" width="1" height="1"/><rect x="8" y="8" width="2" height="1"/><rect x="11" y="8" width="1" height="1"/><rect x="0" y="10" width="1" height="1"/><rect x="2" y="10" width="2" height="1"/><rect x="6" y="10" width="1" height="1"/><rect x="8" y="10" width="1" height="1"/><rect x="10" y="10" width="3" height="1"/><rect x="14" y="10" width="1" height="1"/><rect x="16" y="10" width="1" height="1"/><rect x="18" y="10" width="1" height="1"/><rect x="0" y="12" width="1" height="1"/><rect x="2" y="12" width="1" height="1"/><rect x="4" y="12" width="2" height="1"/><rect x="8" y="12" width="2" height="1"/><rect x="12" y="12" width="1" height="1"/><rect x="14" y="12" width="3" height="1"/><rect x="18" y="12" width="1" height="1"/><rect x="9" y="14" width="1" height="1"/><rect x="11" y="14" width="2" height="1"/><rect x="14" y="14" width="1" height="1"/><rect x="16" y="14" width="1" height="1"/><rect x="9" y="16" width="2" height="1"/><rect x="12" y="16" width="1" height="1"/><rect x="14" y="16" width="1" height="1"/><rect x="16" y="16" width="3" height="1"/><rect x="8" y="18" width="1" height="1"/><rect x="10" y="18" width="1" height="1"/><rect x="12" y="18" width="2" height="1"/><rect x="16" y="18" width="1" height="1"/><rect x="18" y="18" width="1" height="1"/></g></svg>
+                </div>
+              </div>
+              <div style="background:rgba(240,192,64,.07);border:1px solid rgba(240,192,64,.15);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2)">
+                ⚠️ Only send <strong id="depCoinWarn">BTC</strong> to this address. Sending other assets will result in permanent loss.
+              </div>
+              <button class="btn-action btn-green" style="width:100%;padding:13px;font-size:14px;margin-top:14px" onclick="handleDeposit()">✓ I've Sent the Payment — Notify Admin</button>
+            </div>
+
+            <!-- Fiat deposit box -->
+            <div id="fiatDepositBox" style="display:none">
+              <input type="hidden" id="depositAmount" value="500">
+              <div id="cardFields" style="display:none">
+                <div class="form-group"><label class="form-label">Card Number</label><input type="text" class="form-input" placeholder="4242 4242 4242 4242" maxlength="19" oninput="formatCard(this)"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <div class="form-group"><label class="form-label">Expiry</label><input type="text" class="form-input" placeholder="MM/YY" maxlength="5"></div>
+                  <div class="form-group"><label class="form-label">CVV</label><input type="text" class="form-input" placeholder="123" maxlength="4"></div>
+                </div>
+              </div>
+              <div id="wireFields" style="display:none;background:var(--surface2);border-radius:10px;padding:16px;font-size:13px;margin-bottom:12px">
+                <div style="font-weight:700;margin-bottom:12px">Bank Wire Details</div>
+                <div style="display:flex;flex-direction:column;gap:8px;color:var(--text2)">
+                  <div><span style="color:var(--text3);font-size:11px;display:block">Bank Name</span>Barclays Bank PLC</div>
+                  <div><span style="color:var(--text3);font-size:11px;display:block">Account Name</span>RCM Trading Services LLC</div>
+                  <div><span style="color:var(--text3);font-size:11px;display:block">IBAN</span><span style="font-family:var(--font-mono)">GB82 WEST 1234 5698 7654 32</span></div>
+                  <div><span style="color:var(--text3);font-size:11px;display:block">SWIFT/BIC</span><span style="font-family:var(--font-mono)">BARCGB22</span></div>
+                  <div><span style="color:var(--text3);font-size:11px;display:block">Reference</span><span style="font-family:var(--font-mono);color:var(--gold)">RCMDEMO001</span></div>
+                </div>
+              </div>
+              <button class="btn-action btn-green" style="width:100%;padding:13px;font-size:14px" onclick="handleDeposit()">✓ Confirm Deposit — Notify Admin</button>
+            </div>
+            <div id="minDepNote" style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center">No deposit fees · Scan QR or copy address above</div>
+          </div>
+        </div>
+
+        <!-- Withdraw -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Withdraw Funds</span><span class="card-badge badge-red">Processing</span></div>
+          <div class="balance-bar">
+            <div><div class="bal-label">Available to Withdraw</div><div class="bal-val" id="avail-withdraw">$0.00</div></div>
+            <span style="font-size:28px">🏧</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Withdraw To</label>
+            <select class="form-select" id="withdrawMethod" onchange="toggleWithdrawFields()">
+              <option value="btc">Bitcoin Wallet (BTC)</option>
+              <option value="eth">Ethereum Wallet (ETH)</option>
+              <option value="usdt">USDT (TRC20)</option>
+              <option value="bank">Bank Account</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Amount (USD)</label><input type="number" class="form-input" id="withdrawAmount" placeholder="Min $100" value="500"></div>
+          <div id="cryptoWithdrawFields" class="form-group">
+            <label class="form-label">Your Wallet Address</label>
+            <input type="text" class="form-input" id="withdrawAddress" placeholder="bc1qxy2kgdygjrsqtzq2n0yrf...">
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">Double-check your address — withdrawals cannot be reversed.</div>
+          </div>
+          <div id="bankWithdrawFields" style="display:none" class="form-group">
+            <label class="form-label">IBAN / Account Number</label><input type="text" class="form-input" placeholder="GB82 WEST 1234 5698 7654 32">
+            <label class="form-label" style="margin-top:10px">SWIFT / BIC</label><input type="text" class="form-input" placeholder="e.g. BARCGB22">
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Fee</span><span>Network fee only</span></div>
+            <div style="display:flex;justify-content:space-between"><span>Processing time</span><span id="withdrawTime">~30 minutes</span></div>
+          </div>
+          <button class="btn-action btn-red" style="width:100%;padding:13px;font-size:14px" onclick="handleWithdraw()">↑ Request Withdrawal</button>
+          <div style="margin-top:20px">
+            <div class="card-title" style="margin-bottom:12px;font-size:13px">Recent Transactions</div>
+            <table class="data-table"><thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="txTable"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS PANEL ──────────────────────────── -->
+    <div class="panel" id="panel-settings">
+      <div style="max-width:720px;display:flex;flex-direction:column;gap:18px">
+        <!-- Profile -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Profile Information</span><button class="btn-action" style="padding:7px 16px;font-size:12px" onclick="saveProfile()">Save Changes</button></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px">
+            <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" id="set-fn" value="John"></div>
+            <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" id="set-ln" value="Doe"></div>
+            <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="set-email" placeholder="your@email.com"></div>
+            <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-input" placeholder="+1 234 567 8900"></div>
+            <div class="form-group"><label class="form-label">Country</label><select class="form-select"><option>United States</option><option>United Kingdom</option><option>Nigeria</option><option>Germany</option><option>Australia</option></select></div>
+            <div class="form-group"><label class="form-label">Display Currency</label><select class="form-select"><option>USD — Dollar</option><option>EUR — Euro</option><option>GBP — Pound</option><option>BTC — Bitcoin</option></select></div>
+          </div>
+        </div>
+        <!-- Appearance -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Appearance</span></div>
+          <div style="display:flex;flex-direction:column;gap:16px;margin-top:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-weight:600;font-size:14px">Theme</div><div style="font-size:12px;color:var(--text2)">Switch between dark and light mode</div></div>
+              <div style="display:flex;gap:8px">
+                <button id="themeDarkBtn" onclick="setTheme('dark')" style="padding:8px 18px;border-radius:8px;border:1.5px solid var(--gold);background:var(--gold-glow);color:var(--gold);font-weight:700;font-size:13px;cursor:pointer">🌙 Dark</button>
+                <button id="themeLightBtn" onclick="setTheme('light')" style="padding:8px 18px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-weight:700;font-size:13px;cursor:pointer">☀️ Light</button>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-weight:600;font-size:14px">Chart Style</div><div style="font-size:12px;color:var(--text2)">Default chart type</div></div>
+              <select class="form-select" style="width:160px"><option>Candlestick</option><option>Line</option><option>Area</option></select>
+            </div>
+          </div>
+        </div>
+        <!-- Security -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Security</span></div>
+          <div style="display:flex;flex-direction:column;gap:0;margin-top:4px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+              <div><div style="font-weight:600;font-size:14px">Two-Factor Authentication</div><div style="font-size:12px;color:var(--text2)">Require an authenticator code on login</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="toggle2fa" onchange="toggle2FA(this)"><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+              <div><div style="font-weight:600;font-size:14px">Login Alerts</div><div style="font-size:12px;color:var(--text2)">Email me when a new device signs in</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+              <div><div style="font-weight:600;font-size:14px">Withdrawal Confirmation</div><div style="font-size:12px;color:var(--text2)">Email me for every withdrawal request</div></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0">
+              <div><div style="font-weight:600;font-size:14px">Change Password</div><div style="font-size:12px;color:var(--text2)">Last changed 30 days ago</div></div>
+              <button class="btn-action" style="padding:7px 16px;font-size:12px" onclick="showChangePassword()">Change</button>
+            </div>
+          </div>
+        </div>
+        <!-- Notifications -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Notifications</span></div>
+          <div style="display:flex;flex-direction:column;margin-top:4px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div style="font-size:14px;font-weight:600">Trade confirmations</div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div style="font-size:14px;font-weight:600">Price alerts</div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div style="font-size:14px;font-weight:600">Deposit / Withdrawal updates</div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0"><div style="font-size:14px;font-weight:600">Marketing emails</div><label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+          </div>
+        </div>
+        <!-- Danger zone -->
+        <div class="card" style="border-color:rgba(240,85,101,.2)">
+          <div class="card-header"><span class="card-title" style="color:var(--red)">Danger Zone</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+            <div><div style="font-weight:600;font-size:14px">Close Account</div><div style="font-size:12px;color:var(--text2)">Permanently close your account and withdraw all funds</div></div>
+            <button onclick="showToast('Please contact support to close your account','info')" style="padding:8px 16px;border-radius:8px;border:1.5px solid var(--red);background:rgba(240,85,101,.08);color:var(--red);font-weight:700;font-size:13px;cursor:pointer">Close Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="pwModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:400px;margin:20px">
+        <h3 style="font-family:var(--font-head);font-size:18px;font-weight:800;margin-bottom:20px">Change Password</h3>
+        <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" id="pw-current" placeholder="••••••••"></div>
+        <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="pw-new" placeholder="Min 8 chars, 1 uppercase, 1 number"></div>
+        <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" class="form-input" id="pw-confirm" placeholder="Repeat new password"></div>
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button class="btn-action btn-green" style="flex:1;padding:12px" onclick="changePassword()">Update Password</button>
+          <button onclick="document.getElementById('pwModal').style.display='none'" style="flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--border2);background:none;color:var(--text2);font-weight:700;cursor:pointer">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MESSAGES PANEL ─────────────────────────── -->
+    <div class="panel" id="panel-messages">
+      <div style="max-width:600px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">💬 Send Message to Support</span>
+            <span class="card-badge badge-gold">Admin Notified</span>
+          </div>
+          <div style="background:rgba(61,156,240,.07);border:1px solid rgba(61,156,240,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+            Messages are sent directly to admin and to <strong style="color:var(--blue)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="55362734273439253d153238343c397b363a38">[email&#160;protected]</a></strong>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input type="text" class="form-input" id="msgSubject" placeholder="What is this about?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-input" id="msgBody" rows="5" placeholder="Type your message here..." style="resize:vertical;min-height:120px;line-height:1.6"></textarea>
+          </div>
+          <button class="btn-action btn-gold" style="width:100%;padding:13px;font-size:14px" onclick="sendSupportMessage()">📨 Send Message to Admin</button>
+        </div>
+
+        <!-- Message history -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Message History</span></div>
+          <div id="msgHistory" style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+            <div style="color:var(--text3);text-align:center;padding:20px">No messages yet — send your first message above.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ── API base & auth guard ── */
+// Auto-detect API path — works in any subfolder (localhost/out/ or live root)
+const API_BASE = window.location.pathname.replace(/\/[^\/]*$/, '') + '/api';
+(function(){
+  if (!localStorage.getItem('rcm_token')) window.location.href = 'signin.html';
+})();
+</script>
+
+<script>
+/* ── Data ─────────────────────────────────────────── */
+const assets = [
+  { sym:'BTC/USD', full:'Bitcoin',     cat:'crypto',      icon:'₿',  color:'#f7931a', price:67420,   chg:2.41  },
+  { sym:'ETH/USD', full:'Ethereum',    cat:'crypto',      icon:'Ξ',  color:'#627eea', price:3540,    chg:1.82  },
+  { sym:'LTC/USD', full:'Litecoin',    cat:'crypto',      icon:'Ł',  color:'#bfbbbb', price:84.40,   chg:-1.10 },
+  { sym:'XRP/USD', full:'Ripple',      cat:'crypto',      icon:'✕',  color:'#346aa9', price:0.612,   chg:-0.52 },
+  { sym:'ETH/BTC', full:'Eth/Bitcoin', cat:'crypto',      icon:'⚡', color:'#627eea', price:0.05251, chg:0.40  },
+  { sym:'EUR/USD', full:'Euro',        cat:'forex',       icon:'€',  color:'#003399', price:1.0865,  chg:0.12  },
+  { sym:'GBP/USD', full:'Pound',       cat:'forex',       icon:'£',  color:'#CF142B', price:1.2630,  chg:-0.08 },
+  { sym:'USD/JPY', full:'Yen',         cat:'forex',       icon:'¥',  color:'#BC002D', price:149.20,  chg:0.20  },
+  { sym:'AUD/USD', full:'AUS Dollar',  cat:'forex',       icon:'A$', color:'#00008B', price:0.6542,  chg:-0.14 },
+  { sym:'SP500',   full:'S&P 500',     cat:'indices',     icon:'📈', color:'#1f6fad', price:5248.80, chg:0.72  },
+  { sym:'NASDAQ',  full:'NASDAQ',      cat:'indices',     icon:'📊', color:'#5585c5', price:18320,   chg:-0.22 },
+  { sym:'GER30',   full:'DAX 40',      cat:'indices',     icon:'🇩🇪',color:'#000000', price:18540,   chg:0.55  },
+  { sym:'GOLD',    full:'Gold',        cat:'commodities', icon:'🥇', color:'#ffd700', price:2310.50, chg:0.32  },
+  { sym:'CRUDE',   full:'Crude Oil',   cat:'commodities', icon:'🛢️', color:'#8B4513', price:78.40,   chg:-0.90 },
+  { sym:'NAT.GAS', full:'Natural Gas', cat:'commodities', icon:'🔥', color:'#ff6600', price:1.82,    chg:1.20  },
+];
+
+let liveAssets = assets.map(a => ({...a}));
+let currentFilter = 'all';
+let historyFilter = 'all';
+let orderSide = 'buy';
+let balance = 0; // loaded from API
+let pnl = 0; // loaded from API
+
+const positions = []; // populated from API
+
+const historyData = []; // populated from API
+
+const txData = []; // populated from API
+
+/* ── Panels ───────────────────────────────────────── */
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  const titles = { overview:'Overview', trade:'Trade', watchlist:'Watchlist', history:'History', deposit:'Deposit / Withdraw', settings:'Settings', messages:'Support / Messages' };
+  document.getElementById('topbarTitle').textContent = titles[id] || id;
+}
+
+/* ── Copy address ────────────────────────────────── */
+function copyAddress() {
+  const addr = document.getElementById('depWalletAddress').textContent;
+  navigator.clipboard.writeText(addr).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.style.background = 'rgba(31,217,138,.15)';
+    btn.style.borderColor = 'rgba(31,217,138,.4)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2000);
+  }).catch(() => {
+    showToast('Copy failed — please copy manually','error');
+  });
+}
+
+function toggleWithdrawFields() {
+  const method = document.getElementById('withdrawMethod').value;
+  const cryptoF = document.getElementById('cryptoWithdrawFields');
+  const bankF   = document.getElementById('bankWithdrawFields');
+  const timeEl  = document.getElementById('withdrawTime');
+  if (method === 'bank') {
+    cryptoF.style.display = 'none';
+    bankF.style.display   = 'block';
+    timeEl.textContent    = '1–3 business days';
+  } else {
+    cryptoF.style.display = 'block';
+    bankF.style.display   = 'none';
+    const times = { btc:'~30 minutes', eth:'~10 minutes', usdt:'~5 minutes' };
+    timeEl.textContent = times[method] || '~30 minutes';
+    const placeholders = { btc:'bc1qxy2kgdygjrsqtzq2n0yrf...', eth:'0x71C7656EC7ab88...', usdt:'TQn9Y2khEsLJW1Ch...' };
+    document.getElementById('withdrawAddress').placeholder = placeholders[method] || 'Your wallet address';
+  }
+}
+
+// saveProfile — defined in real-account script
+
+function toggle2FA(el) {
+  if (el.checked) {
+    showToast('2FA enabled — authenticator app required on next login','success');
+  } else {
+    showToast('2FA disabled — your account is less secure','info');
+  }
+}
+
+function showChangePassword() {
+  document.getElementById('pwModal').style.display = 'flex';
+}
+
+// changePassword — defined in real-account script
+
+function formatCard(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  el.value = v.replace(/(\d{4})/g,'$1 ').trim();
+}
+
+function showToast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const icons = { success:'✅', error:'❌', info:'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+/* ── Watchlist render ─────────────────────────────── */
+function renderWatchlistItem(a) {
+  const up = a.chg >= 0;
+  const spark = generateSparkPoints(a.price, 8);
+  return `
+  <div class="watchlist-item" onclick="selectAssetForTrade('${a.sym}',${a.price})">
+    <div class="asset-icon" style="background:${a.color}22;color:${a.color}">${a.icon}</div>
+    <div class="asset-info">
+      <div class="asset-name">${a.sym}</div>
+      <div class="asset-full">${a.full}</div>
+    </div>
+    <canvas class="mini-spark" data-points="${spark.join(',')}"></canvas>
+    <div class="asset-price">
+      <div class="pr">${formatPrice(a.price)}</div>
+      <div class="chg ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(a.chg).toFixed(2)}%</div>
+    </div>
+  </div>`;
+}
+
+function renderWatchlists() {
+  const filtered = currentFilter === 'all' ? liveAssets : liveAssets.filter(a => a.cat === currentFilter);
+  document.getElementById('watchlistFull').innerHTML = filtered.map(renderWatchlistItem).join('');
+  document.getElementById('tradeWatchlist').innerHTML = liveAssets.slice(0,5).map(renderWatchlistItem).join('');
+  drawAllMiniSparks();
+}
+
+function filterWatchlist(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('#panel-watchlist .filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderWatchlists();
+}
+
+function renderTopMovers() {
+  const sorted = [...liveAssets].sort((a,b) => Math.abs(b.chg)-Math.abs(a.chg)).slice(0,5);
+  document.getElementById('topMovers').innerHTML = sorted.map(a => {
+    const up = a.chg>=0;
+    return `<div class="watchlist-item">
+      <div class="asset-icon" style="background:${a.color}22;color:${a.color}">${a.icon}</div>
+      <div class="asset-info"><div class="asset-name">${a.sym}</div></div>
+      <div class="asset-price">
+        <div class="chg ${up?'up':'dn'}" style="font-size:14px;font-weight:700">${up?'+':''}${a.chg.toFixed(2)}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Positions ────────────────────────────────────── */
+function renderPositions() {
+  const tb = document.querySelector('#positionsTable tbody');
+  tb.innerHTML = positions.map((p,i) => {
+    const up = p.pnl >= 0;
+    return `<tr>
+      <td><strong>${p.sym}</strong></td>
+      <td><span class="card-badge ${p.side==='BUY'?'badge-green':'badge-red'}">${p.side}</span></td>
+      <td class="mono ${up?'up':'dn'}">${up?'+':''}$${Math.abs(p.pnl).toFixed(2)}</td>
+      <td><button onclick="closePosition(${i})" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--red);font-size:11px;font-weight:700;cursor:pointer">Close</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function closePosition(i) {
+  const p = positions[i];
+  balance += p.pnl;
+  showToast(`${p.sym} closed — P&L: ${p.pnl>=0?'+':''}$${p.pnl.toFixed(2)}`, p.pnl>=0?'success':'error');
+  positions.splice(i,1);
+  renderPositions();
+  updateStatCards();
+}
+
+/* ── Recent Trades ────────────────────────────────── */
+function renderRecentTrades() {
+  const tb = document.querySelector('#recentTradesTable tbody');
+  tb.innerHTML = historyData.slice(0,5).map(t => {
+    const up = t.pnl>=0;
+    return `<tr>
+      <td><strong>${t.pair}</strong></td>
+      <td><span class="card-badge ${t.side==='BUY'?'badge-green':'badge-red'}">${t.side}</span></td>
+      <td class="mono ${up?'up':'dn'}">${up?'+':''}$${Math.abs(t.pnl).toFixed(2)}</td>
+      <td style="color:var(--text3);font-size:11px">${t.date.split(' ')[1]}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── History ──────────────────────────────────────── */
+function renderHistory() {
+  const badge = document.getElementById('historyBadge');
+  if(badge) badge.textContent = historyData.length + ' trades';
+  let data = historyData;
+  if(historyFilter==='buy')  data = data.filter(t=>t.side==='BUY');
+  if(historyFilter==='sell') data = data.filter(t=>t.side==='SELL');
+  if(historyFilter==='win')  data = data.filter(t=>t.pnl>0);
+  if(historyFilter==='loss') data = data.filter(t=>t.pnl<0);
+  const tb = document.getElementById('historyBody');
+  tb.innerHTML = data.map(t => {
+    const up = t.pnl>=0;
+    return `<tr>
+      <td style="color:var(--text3);font-size:11px">${t.date}</td>
+      <td><strong>${t.pair}</strong></td>
+      <td><span class="card-badge ${t.side==='BUY'?'badge-green':'badge-red'}">${t.side}</span></td>
+      <td class="mono">${formatPrice(t.entry)}</td>
+      <td class="mono">${formatPrice(t.exit)}</td>
+      <td class="mono">$${t.size}</td>
+      <td class="mono ${up?'up':'dn'}">${up?'+':''}$${Math.abs(t.pnl).toFixed(2)}</td>
+      <td><span class="card-badge ${up?'badge-green':'badge-red'}">${up?'Win':'Loss'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterHistory(f, btn) {
+  historyFilter = f;
+  document.querySelectorAll('#panel-history .filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHistory();
+}
+
+/* ── Transactions ─────────────────────────────────── */
+function renderTransactions() {
+  document.getElementById('txTable').innerHTML = txData.map(t => {
+    const isIn = t.type==='Deposit';
+    return `<tr>
+      <td><span class="card-badge ${isIn?'badge-green':'badge-red'}">${t.type}</span></td>
+      <td class="mono ${isIn?'up':'dn'}">${t.amount}</td>
+      <td><span class="card-badge ${t.status==='Complete'?'badge-green':'badge-gold'}">${t.status}</span></td>
+      <td style="color:var(--text3);font-size:11px">${t.date}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Deposit / Withdraw ───────────────────────────── */
+/* ── Wallet addresses (replace with real ones from your DB) ─── */
+const walletAddresses = {
+  BTC:  { addr:'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', net:'Bitcoin Network (BTC)',   note:'Only send BTC to this address.' },
+  ETH:  { addr:'0x71C7656EC7ab88b098defB751B7401B5f6d8976F', net:'Ethereum Network (ERC20)', note:'Only send ETH or ERC-20 tokens.' },
+  USDT: { addr:'TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE',         net:'TRON Network (TRC20)',    note:'Only send USDT TRC20 to this address.' },
+  USDC: { addr:'0x71C7656EC7ab88b098defB751B7401B5f6d8976F', net:'Ethereum Network (ERC20)', note:'Only send USDC ERC20 to this address.' },
+};
+
+let currentDepMethod = 'BTC';
+let currentWdMethod  = 'BTC';
+
+/* ── Deposit / Withdraw tab switcher ─────────────────────────── */
+function switchDepTab(tab) {
+  const isDeposit = tab === 'deposit';
+  document.getElementById('depTab').style.display = isDeposit ? '' : 'none';
+  document.getElementById('wdTab').style.display  = isDeposit ? 'none' : '';
+  document.getElementById('depTabBtn').style.background = isDeposit ? 'var(--gold)' : 'transparent';
+  document.getElementById('depTabBtn').style.color      = isDeposit ? '#0a0a0a' : 'var(--text2)';
+  document.getElementById('wdTabBtn').style.background  = isDeposit ? 'transparent' : 'var(--gold)';
+  document.getElementById('wdTabBtn').style.color       = isDeposit ? 'var(--text2)' : '#0a0a0a';
+}
+
+/* ── Select deposit method ───────────────────────────────────── */
+function selectDepMethod(el, method) {
+  document.querySelectorAll('#depMethodGrid .method-card').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  currentDepMethod = method;
+
+  if (walletAddresses[method]) {
+    // Crypto method — show wallet address
+    const w = walletAddresses[method];
+    document.getElementById('cryptoAddrBox').style.display = '';
+    document.getElementById('altDepBox').style.display     = 'none';
+    document.getElementById('addrLabel').textContent       = `Send ${method} to this address`;
+    document.getElementById('walletAddress').textContent   = w.addr;
+    document.getElementById('addrNote').textContent        = w.note;
+    document.getElementById('copyAddrBtn').textContent     = `📋 Copy ${method} Address`;
+    drawQR(w.addr);
+  } else if (method === 'CARD') {
+    document.getElementById('cryptoAddrBox').style.display = 'none';
+    document.getElementById('altDepBox').style.display     = '';
+    document.getElementById('altDepContent').innerHTML     = `
+      <div style="font-weight:700;margin-bottom:12px;font-size:14px">💳 Credit / Debit Card</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">Pay securely via our card processor. Your card details are encrypted and never stored on our servers.</div>
+      <input type="text" class="form-input" placeholder="Card number" style="margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <input type="text" class="form-input" placeholder="MM / YY">
+        <input type="text" class="form-input" placeholder="CVV">
+      </div>
+      <input type="number" class="form-input" placeholder="Amount in USD (min $50)" style="margin-bottom:12px">
+      <button class="btn-action btn-green" style="width:100%;padding:12px;font-size:13px" onclick="showToast('Card payment processed! Funds will appear shortly.','success')">Pay Now →</button>`;
+  } else if (method === 'WIRE') {
+    document.getElementById('cryptoAddrBox').style.display = 'none';
+    document.getElementById('altDepBox').style.display     = '';
+    document.getElementById('altDepContent').innerHTML     = `
+      <div style="font-weight:700;margin-bottom:12px;font-size:14px">🏦 Bank Wire Transfer</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Use these banking details to wire funds. Processing takes 1–3 business days.</div>
+      ${[['Bank Name','Barclays Bank PLC'],['Account Name','RCM Trading Services LLC'],['IBAN','GB29 NWBK 6016 1331 9268 19'],['SWIFT / BIC','BARCGB22'],['Reference','Your Account UUID']].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text2)">${l}</span><span style="font-weight:700;font-family:var(--font-mono)">${v}</span></div>`).join('')}
+      <p style="font-size:11px;color:var(--text3);margin-top:12px">Always include your account UUID as the payment reference so funds are credited correctly.</p>`;
+  }
+}
+
+/* ── Copy wallet address ─────────────────────────────────────── */
+function copyWalletAddress() {
+  const addr = document.getElementById('walletAddress').textContent;
+  navigator.clipboard.writeText(addr).then(() => {
+    const btn = document.getElementById('copyAddrBtn');
+    btn.textContent = '✓ Copied!';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'rgba(31,217,138,.4)';
+    showToast('Wallet address copied to clipboard!', 'success');
+    setTimeout(() => {
+      btn.textContent  = `📋 Copy ${currentDepMethod} Address`;
+      btn.style.color  = '';
+      btn.style.borderColor = '';
+    }, 2500);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = addr; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Address copied!', 'success');
+  });
+}
+
+/* ── Simple QR code renderer (pure canvas, no library) ──────── */
+function drawQR(text) {
+  const canvas = document.getElementById('qrCanvas');
+  const ctx    = canvas.getContext('2d');
+  const size   = 140;
+  ctx.clearRect(0, 0, size, size);
+
+  // Dark/light aware
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const bg     = isDark ? '#131827' : '#ffffff';
+  const fg     = isDark ? '#f0c040' : '#111827';
+
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
+
+  // Deterministic pseudo-QR from address chars (visual only)
+  const cells = 21;
+  const cell  = Math.floor(size / cells);
+  ctx.fillStyle = fg;
+
+  // Fixed finder patterns (corners)
+  [[0,0],[0,14],[14,0]].forEach(([r,c]) => {
+    ctx.fillRect(c*cell, r*cell, 7*cell, 7*cell);
+    ctx.fillStyle = bg;
+    ctx.fillRect((c+1)*cell, (r+1)*cell, 5*cell, 5*cell);
+    ctx.fillStyle = fg;
+    ctx.fillRect((c+2)*cell, (r+2)*cell, 3*cell, 3*cell);
+    ctx.fillStyle = fg;
+  });
+
+  // Data modules from address hash
+  for (let i = 0; i < text.length * 3; i++) {
+    const code = text.charCodeAt(i % text.length) ^ (i * 7);
+    const r    = (code * 13 + i * 3) % cells;
+    const c    = (code * 7  + i * 5) % cells;
+    if (r < 8 && c < 8) continue; // skip finder
+    if (r < 8 && c > 13) continue;
+    if (r > 13 && c < 8) continue;
+    ctx.fillRect(c * cell, r * cell, cell - 1, cell - 1);
+  }
+
+  // Centre label
+  ctx.fillStyle = isDark ? 'rgba(5,10,24,.85)' : 'rgba(255,255,255,.85)';
+  ctx.fillRect(size/2-22, size/2-10, 44, 20);
+  ctx.fillStyle = isDark ? '#f0c040' : '#111827';
+  ctx.font = `bold 9px monospace`;
+  ctx.textAlign = 'center';
+  ctx.fillText(currentDepMethod, size/2, size/2+4);
+}
+
+/* ── Withdraw method selector ────────────────────────────────── */
+function selectWdMethod(el, method) {
+  document.querySelectorAll('#wdMethodGrid .method-card').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  currentWdMethod = method;
+  const labels = { BTC:'Recipient Bitcoin Address', ETH:'Recipient Ethereum Address', USDT:'Recipient USDT (TRC20) Address', WIRE:'IBAN or Account Number' };
+  const placeholders = { BTC:'bc1q...', ETH:'0x...', USDT:'T...', WIRE:'GB29 NWBK...' };
+  document.getElementById('wdAddrLabel').textContent     = labels[method] || 'Wallet Address';
+  document.getElementById('wdAddress').placeholder       = placeholders[method] || '';
+}
+
+/* ── Withdraw MAX button ─────────────────────────────────────── */
+function wdSetMax() {
+  document.getElementById('withdrawAmount').value = 18320;
+  updateWdSummary();
+}
+
+/* ── Withdraw summary live update ────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  const wdAmt = document.getElementById('withdrawAmount');
+  if (wdAmt) wdAmt.addEventListener('input', updateWdSummary);
+  // Init deposit method
+  const firstDepCard = document.querySelector('#depMethodGrid .method-card');
+  if (firstDepCard) selectDepMethod(firstDepCard, 'BTC');
+  // Init notifications
+  renderNotifSettings();
+  // Load theme preference
+  const saved = localStorage.getItem('rcm_theme');
+  if (saved) setTheme(saved, false);
+});
+
+function updateWdSummary() {
+  const amt = parseFloat(document.getElementById('withdrawAmount')?.value) || 0;
+  const fee = currentWdMethod === 'WIRE' ? 25 : Math.min(amt * 0.005, 15);
+  document.getElementById('wdSummaryAmt').textContent = '$' + amt.toFixed(2);
+  document.getElementById('wdSummaryFee').textContent = fee < 0.01 ? 'Free' : '~$' + fee.toFixed(2);
+  document.getElementById('wdSummaryNet').textContent = '$' + Math.max(0, amt - fee).toFixed(2);
+}
+
+function handleWithdraw() {
+  const amt  = parseFloat(document.getElementById('withdrawAmount').value);
+  const addr = document.getElementById('wdAddress').value.trim();
+  if (!amt || amt < 100) { showToast('Minimum withdrawal is $100','error'); return; }
+  if (amt > balance)     { showToast('Insufficient available balance','error'); return; }
+  if (!addr)             { showToast('Please enter a wallet address or bank account','error'); return; }
+  balance -= amt;
+  txData.unshift({ type:'Withdraw', amount:`-$${amt.toLocaleString()}`, status:'Pending', date: new Date().toISOString().split('T')[0] });
+  updateStatCards();
+  renderTransactions();
+  showToast(`Withdrawal of $${amt.toLocaleString()} submitted — you'll receive an email confirmation.`, 'success');
+  document.getElementById('withdrawAmount').value = '';
+  document.getElementById('wdAddress').value = '';
+  updateWdSummary();
+}
+
+/* ── Settings functions ──────────────────────────────────────── */
+function setTheme(theme, save=true) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  const db = document.getElementById('setDarkBtn');
+  const lb = document.getElementById('setLightBtn');
+  if (db && lb) {
+    db.style.borderColor  = theme==='dark'  ? 'var(--gold)' : 'var(--border2)';
+    db.style.background   = theme==='dark'  ? 'var(--gold-glow)' : 'transparent';
+    db.style.color        = theme==='dark'  ? 'var(--gold)' : 'var(--text2)';
+    lb.style.borderColor  = theme==='light' ? 'var(--gold)' : 'var(--border2)';
+    lb.style.background   = theme==='light' ? 'var(--gold-glow)' : 'transparent';
+    lb.style.color        = theme==='light' ? 'var(--gold)' : 'var(--text2)';
+  }
+  if (save) localStorage.setItem('rcm_theme', theme);
+  // Redraw QR if open
+  const addr = document.getElementById('walletAddress');
+  if (addr) drawQR(addr.textContent);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  setTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+
+
+
+const notifOptions = [
+  { key:'login',    label:'Login alerts',          desc:'Email when a new device signs in',  default:true  },
+  { key:'deposit',  label:'Deposit confirmations', desc:'Email when funds are credited',      default:true  },
+  { key:'withdraw', label:'Withdrawal updates',    desc:'Email when withdrawal is processed', default:true  },
+  { key:'trade',    label:'Trade confirmations',   desc:'Email when positions open/close',    default:false },
+  { key:'news',     label:'Market news',           desc:'Weekly market digest',               default:false },
+  { key:'promo',    label:'Promotions',            desc:'Contests, bonuses, and offers',      default:false },
+];
+
+function renderNotifSettings() {
+  const cont = document.getElementById('notifSettings');
+  if (!cont) return;
+  cont.innerHTML = notifOptions.map(n => {
+    const saved = localStorage.getItem(`notif_${n.key}`);
+    const checked = saved !== null ? saved === 'true' : n.default;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surface2);border-radius:10px">
+      <div><div style="font-weight:700;font-size:13px;margin-bottom:2px">${n.label}</div><div style="font-size:12px;color:var(--text2)">${n.desc}</div></div>
+      <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+        <input type="checkbox" ${checked?'checked':''} onchange="saveNotif('${n.key}',this.checked)" style="opacity:0;width:0;height:0">
+        <span style="position:absolute;inset:0;background:${checked?'var(--gold)':'var(--border2)'};border-radius:99px;transition:.25s" onclick="this.style.background=this.previousElementSibling.checked?'var(--gold)':'var(--border2)'"></span>
+      </label>
+    </div>`;
+  }).join('');
+}
+
+function saveNotif(key, val) {
+  localStorage.setItem(`notif_${key}`, val);
+  showToast('Notification preferences saved', 'success');
+}
+
+// confirmLogout — defined in real-account script
+
+/* ── Order panel ──────────────────────────────────── */
+function setOrderSide(side, btn) {
+  orderSide = side;
+  document.querySelectorAll('.order-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const tb = document.getElementById('tradeBtn');
+  if(side==='buy') { tb.className='btn-trade buy'; tb.textContent='OPEN LONG POSITION'; }
+  else             { tb.className='btn-trade sell'; tb.textContent='OPEN SHORT POSITION'; }
+}
+
+function updateOrderCalc() {
+  const mkt  = document.getElementById('orderMarket');
+  const price = parseFloat(mkt.value);
+  const amt   = parseFloat(document.getElementById('orderAmount').value)||0;
+  const lev   = parseFloat(document.getElementById('leverageSlider').value);
+  const pos   = amt * lev;
+  const fee   = pos * 0.0005;
+  const liq   = orderSide==='buy' ? price*(1-1/lev*0.9) : price*(1+1/lev*0.9);
+  document.getElementById('orderSummary').innerHTML = `
+    <div class="summary-row"><span>Position Size</span><span>$${pos.toLocaleString('en',{maximumFractionDigits:2})}</span></div>
+    <div class="summary-row"><span>Leverage</span><span>${lev}×</span></div>
+    <div class="summary-row"><span>Est. Fee</span><span>$${fee.toFixed(2)}</span></div>
+    <div class="summary-row"><span>Liq. Price</span><span class="dn">~${formatPrice(liq)}</span></div>
+  `;
+  // update chart title
+  const symName = mkt.options[mkt.selectedIndex].text.split(' — ')[0];
+  document.getElementById('tradeChartTitle').textContent = symName;
+  document.getElementById('tradeChartPrice').textContent = formatPrice(price);
+}
+
+function placeOrder() {
+  const mkt    = document.getElementById('orderMarket');
+  const price  = parseFloat(mkt.value);
+  const amt    = parseFloat(document.getElementById('orderAmount').value)||0;
+  const lev    = parseFloat(document.getElementById('leverageSlider').value);
+  const sym    = mkt.options[mkt.selectedIndex].text.split(' — ')[0];
+  if(amt<10) { showToast('Minimum order size is $10','error'); return; }
+  if(amt>balance) { showToast('Insufficient balance','error'); return; }
+  const newPnl = (Math.random()-0.45) * amt * 0.15;
+  positions.push({ sym, side: orderSide==='buy'?'BUY':'SELL', entry:price, size:amt, pnl:newPnl });
+  balance -= amt;
+  updateStatCards();
+  renderPositions();
+  showToast(`${orderSide==='buy'?'Long':'Short'} ${sym} opened — $${amt} at ${formatPrice(price)}`, 'success');
+}
+
+function selectAssetForTrade(sym, price) {
+  showPanel('trade', document.querySelectorAll('.nav-item')[1]);
+  showToast(`${sym} selected`, 'info');
+}
+
+/* ── Stats ────────────────────────────────────────── */
+function updateStatCards() {
+  document.getElementById('stat-balance').textContent = '$'+balance.toLocaleString('en',{minimumFractionDigits:2});
+  const totalPnl = positions.reduce((s,p)=>s+p.pnl, 0);
+  const pnlEl = document.getElementById('stat-pnl');
+  pnlEl.textContent = (totalPnl>=0?'+':'') + '$'+Math.abs(totalPnl).toFixed(2);
+  pnlEl.className = 'stat-value '+(totalPnl>=0?'up':'dn');
+}
+
+/* ── Ticker bar ───────────────────────────────────── */
+function renderTopTicker() {
+  document.getElementById('topTicker').innerHTML = liveAssets.slice(0,5).map(a => {
+    const up = a.chg>=0;
+    return `<span class="ticker-chip">
+      <span class="sym">${a.sym}</span>
+      <span class="pr">${formatPrice(a.price)}</span>
+      <span class="chg ${up?'up':'dn'}">${up?'▲':'▼'}${Math.abs(a.chg).toFixed(2)}%</span>
+    </span>`;
+  }).join('');
+}
+
+/* ── Donut chart ──────────────────────────────────── */
+function drawDonut() {
+  const c = document.getElementById('donutChart');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height, cx = W/2, cy = H/2, r = 48, inner = 30;
+  const data = [
+    { label:'Crypto', val:45, color:'#f0c040' },
+    { label:'Forex',  val:25, color:'#3d9cf0' },
+    { label:'Indices',val:20, color:'#1fd98a' },
+    { label:'Commod.',val:10, color:'#f05565' },
+  ];
+  ctx.clearRect(0,0,W,H);
+  let start = -Math.PI/2;
+  data.forEach(d => {
+    const angle = (d.val/100)*Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,start,start+angle);
+    ctx.closePath();
+    ctx.fillStyle = d.color;
+    ctx.fill();
+    start += angle;
+  });
+  // inner circle
+  ctx.beginPath();
+  ctx.arc(cx,cy,inner,0,Math.PI*2);
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  ctx.fillStyle = isDark ? '#131827' : '#ffffff';
+  ctx.fill();
+  // legend
+  document.getElementById('donutLegend').innerHTML = data.map(d=>`
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="width:10px;height:10px;border-radius:3px;background:${d.color};display:inline-block;flex-shrink:0"></span>
+      <span style="color:var(--text2)">${d.label}</span>
+      <span style="margin-left:auto;font-family:var(--font-mono);font-weight:600">${d.val}%</span>
+    </div>
+  `).join('');
+}
+
+/* ── Equity chart ─────────────────────────────────── */
+function generateEquityPoints(n=40) {
+  const pts = [22000];
+  for(let i=1;i<n;i++) pts.push(pts[i-1]+(Math.random()-0.38)*400);
+  pts.push(balance);
+  return pts;
+}
+
+function drawEquityChart() {
+  const c = document.getElementById('equityChart');
+  if(!c) return;
+  const rect = c.parentElement.getBoundingClientRect();
+  c.width = rect.width||600; c.height = 200;
+  const ctx = c.getContext('2d');
+  const pts = generateEquityPoints();
+  const W=c.width, H=c.height, pad=20;
+  const minV=Math.min(...pts)-500, maxV=Math.max(...pts)+500;
+  const x = i => pad + i*(W-2*pad)/(pts.length-1);
+  const y = v => H-pad - (v-minV)/(maxV-minV)*(H-2*pad);
+  ctx.clearRect(0,0,W,H);
+  // gradient fill
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(240,192,64,0.2)');
+  grad.addColorStop(1,'rgba(240,192,64,0)');
+  ctx.beginPath();
+  ctx.moveTo(x(0),y(pts[0]));
+  pts.forEach((_,i)=>{ if(i>0) ctx.lineTo(x(i),y(pts[i])); });
+  ctx.lineTo(x(pts.length-1),H); ctx.lineTo(x(0),H); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+  // line
+  ctx.beginPath();
+  ctx.moveTo(x(0),y(pts[0]));
+  pts.forEach((_,i)=>{ if(i>0) ctx.lineTo(x(i),y(pts[i])); });
+  ctx.strokeStyle='#f0c040'; ctx.lineWidth=2; ctx.stroke();
+  // dot at end
+  ctx.beginPath();
+  ctx.arc(x(pts.length-1),y(pts[pts.length-1]),4,0,Math.PI*2);
+  ctx.fillStyle='#f0c040'; ctx.fill();
+}
+
+/* ── Trade chart ──────────────────────────────────── */
+let tradeChartPts = [];
+function drawTradeChart() {
+  const c = document.getElementById('tradeChart');
+  if(!c) return;
+  const rect = c.parentElement.getBoundingClientRect();
+  c.width = rect.width||400; c.height = 220;
+  const ctx = c.getContext('2d');
+  if(!tradeChartPts.length) {
+    let v = 67420;
+    for(let i=0;i<60;i++) { v += (Math.random()-0.48)*200; tradeChartPts.push(v); }
+  }
+  const pts = tradeChartPts;
+  const W=c.width,H=c.height,pad=10;
+  const minV=Math.min(...pts)-300, maxV=Math.max(...pts)+300;
+  const x = i=>pad+i*(W-2*pad)/(pts.length-1);
+  const y = v=>H-pad-(v-minV)/(maxV-minV)*(H-2*pad);
+  ctx.clearRect(0,0,W,H);
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+  for(let i=1;i<4;i++) { ctx.beginPath(); ctx.moveTo(0,H/4*i); ctx.lineTo(W,H/4*i); ctx.stroke(); }
+  // fill
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'rgba(61,156,240,0.2)'); g.addColorStop(1,'rgba(61,156,240,0)');
+  ctx.beginPath(); ctx.moveTo(x(0),y(pts[0]));
+  pts.forEach((_,i)=>{ if(i) ctx.lineTo(x(i),y(pts[i])); });
+  ctx.lineTo(x(pts.length-1),H); ctx.lineTo(x(0),H); ctx.closePath();
+  ctx.fillStyle=g; ctx.fill();
+  // line
+  ctx.beginPath(); ctx.moveTo(x(0),y(pts[0]));
+  pts.forEach((_,i)=>{ if(i) ctx.lineTo(x(i),y(pts[i])); });
+  ctx.strokeStyle='#3d9cf0'; ctx.lineWidth=2; ctx.stroke();
+}
+
+/* ── Mini sparklines ──────────────────────────────── */
+function generateSparkPoints(basePrice, n=8) {
+  const pts=[basePrice];
+  for(let i=1;i<n;i++) pts.push(pts[i-1]*(1+(Math.random()-0.48)*0.02));
+  return pts.map(v=>v.toFixed(4));
+}
+
+function drawAllMiniSparks() {
+  document.querySelectorAll('canvas.mini-spark').forEach(c => {
+    const pts = c.dataset.points.split(',').map(Number);
+    c.width=60; c.height=28;
+    const ctx = c.getContext('2d');
+    const W=60,H=28,pad=2;
+    const min=Math.min(...pts), max=Math.max(...pts);
+    const x=i=>pad+i*(W-2*pad)/(pts.length-1);
+    const y=v=>(max===min)?H/2:H-pad-(v-min)/(max-min)*(H-2*pad);
+    const up = pts[pts.length-1]>=pts[0];
+    ctx.beginPath(); ctx.moveTo(x(0),y(pts[0]));
+    pts.forEach((_,i)=>{ if(i) ctx.lineTo(x(i),y(pts[i])); });
+    ctx.strokeStyle = up?'#1fd98a':'#f05565';
+    ctx.lineWidth=1.5; ctx.stroke();
+  });
+}
+
+/* ── Live price sim ───────────────────────────────── */
+function simulatePrices() {
+  liveAssets = liveAssets.map(a => ({
+    ...a,
+    price: a.price*(1+(Math.random()-0.5)*0.001),
+    chg: a.chg + (Math.random()-0.5)*0.05
+  }));
+  renderTopTicker();
+  // refresh open positions pnl slightly
+  positions.forEach(p => { p.pnl += (Math.random()-0.48)*2; });
+  renderPositions();
+  updateStatCards();
+}
+
+/* ── Helpers ──────────────────────────────────────── */
+function formatPrice(v) {
+  if(v>=1000) return '$'+v.toLocaleString('en',{maximumFractionDigits:2});
+  if(v>=1)    return '$'+v.toFixed(4).replace(/\.?0+$/,'');
+  return '$'+v.toFixed(5);
+}
+
+/* ── Support messages ─────────────────────────── */
+// sendSupportMessage — defined in real-account script
+
+// renderMessageHistory — defined in script 1
+
+/* ── Init ─────────────────────────────────────────── */
+function init() {
+  renderWatchlists();
+  renderTopMovers();
+  renderPositions();
+  renderRecentTrades();
+  renderHistory();
+  renderTransactions();
+  renderTopTicker();
+  updateOrderCalc();
+  updateStatCards();
+  renderMessageHistory();
+  setTimeout(()=>{ drawEquityChart(); drawDonut(); drawTradeChart(); }, 100);
+}
+
+window.addEventListener('resize', () => { drawEquityChart(); drawTradeChart(); });
+window.addEventListener('DOMContentLoaded', init);
+setInterval(simulatePrices, 2000);
+setInterval(()=>{ drawEquityChart(); }, 5000);
+
+/* ── Aliases for deposit panel ───────────────────── */
+function selectMethod(el, method) {
+  // Map the new panel's method keys to the existing selectDepMethod keys
+  const keyMap = { btc:'BTC', eth:'ETH', usdt:'USDT', usdc:'USDC', card:'CARD', wire:'WIRE' };
+  const mapped = keyMap[method] || method.toUpperCase();
+
+  // Update active state within whichever method-grid this card is in
+  const grid = el.closest('.method-grid');
+  if (grid) grid.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+
+  const cryptoBox = document.getElementById('cryptoDepositBox');
+  const fiatBox   = document.getElementById('fiatDepositBox');
+  const cardF     = document.getElementById('cardFields');
+  const wireF     = document.getElementById('wireFields');
+  const minNote   = document.getElementById('minDepNote');
+
+  const walletMap = {
+    BTC:  { addr:'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', net:'Bitcoin Network (BTC)',    coin:'BTC'  },
+    ETH:  { addr:'0x71C7656EC7ab88b098defB751B7401B5f6d8976F',  net:'Ethereum Network (ERC20)', coin:'ETH'  },
+    USDT: { addr:'TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE',          net:'TRON Network (TRC20)',    coin:'USDT' },
+    USDC: { addr:'0x71C7656EC7ab88b098defB751B7401B5f6d8976F',  net:'Ethereum Network (ERC20)', coin:'USDC' },
+  };
+
+  if (walletMap[mapped]) {
+    const w = walletMap[mapped];
+    if (cryptoBox) cryptoBox.style.display = '';
+    if (fiatBox)   fiatBox.style.display   = 'none';
+    const addrEl = document.getElementById('depWalletAddress');
+    const netEl  = document.getElementById('depNetworkLabel');
+    const warnEl = document.getElementById('depCoinWarn');
+    if (addrEl) addrEl.textContent = w.addr;
+    if (netEl)  netEl.textContent  = w.net;
+    if (warnEl) warnEl.textContent = w.coin;
+    if (minNote) minNote.textContent = 'No deposit fees · Scan QR or copy address above';
+  
+  
+  //} else if (mapped === 'CARD') {
+    //if (cryptoBox) cryptoBox.style.display = 'none'; // hide crypto wallet box
+    //if (fiatBox)   fiatBox.style.display   = '';     // show fiat deposit box
+   // if (cardF)     cardF.style.display     = '';     // show card fields
+  //  if (wireF)     wireF.style.display     = 'none'; // hide bank wire fields
+   // if (minNote)   minNote.textContent     = 'Minimum $50 · 2.5% card processing fee'; // update hint text
+//}
+  
+  
+   } else if (mapped === 'WIRE') {
+    if (cryptoBox) cryptoBox.style.display = 'none';
+    if (fiatBox)   fiatBox.style.display   = '';
+    if (cardF)     cardF.style.display     = 'none';
+    if (wireF)     wireF.style.display     = '';
+    if (minNote)   minNote.textContent     = 'Minimum $100 · No fees · 1–3 business days';
+  }
+}
+
+/* ── Deposit step flow ─────────────────────────── */
+function setDepAmt(v) {
+  document.getElementById('depositAmountStep1').value = v;
+}
+
+function proceedToPaymentMethod() {
+  const amt = parseFloat(document.getElementById('depositAmountStep1').value);
+  if (!amt || amt < 50) { showToast('Minimum deposit is $50', 'error'); return; }
+  document.getElementById('depositAmountConfirm').textContent = '$' + amt.toLocaleString('en', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('depositAmount').value = amt;
+  document.getElementById('depositStep1').style.display = 'none';
+  document.getElementById('depositStep2').style.display = '';
+  // Notify admin about pending payment intent
+  sendAdminNotification({
+    type: 'payment_intent',
+    user: document.querySelector('.user-info strong').textContent,
+    amount: amt,
+    status: 'Selecting Payment Method',
+    time: new Date().toISOString()
+  });
+}
+
+function goBackToStep1() {
+  document.getElementById('depositStep1').style.display = '';
+  document.getElementById('depositStep2').style.display = 'none';
+}
+
+/* ── Admin notification sender ─────────────────── */
+function sendAdminNotification(data) {
+  // Store notification in localStorage for admin page to read
+  const notifications = JSON.parse(localStorage.getItem('rcm_admin_notifications') || '[]');
+  notifications.unshift({ id: Date.now(), ...data, read: false });
+  localStorage.setItem('rcm_admin_notifications', JSON.stringify(notifications));
+  // Also dispatch storage event so admin page updates in real time
+  window.dispatchEvent(new StorageEvent('storage', { key: 'rcm_admin_notifications' }));
+}
+
+// handleDeposit — defined in real-account script
+
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD — REAL ACCOUNT MODE
+   ══════════════════════════════════════════════════════════ */
+
+// ── Auth guard — always redirect if no token ──────────────
+(function authGuard() {
+  const token = localStorage.getItem('rcm_token');
+  if (!token) {
+    window.location.href = 'signin.html';
+    return;
+  }
+})();
+
+// ── Fetch helper with auto-logout on 401 ─────────────────
+async function api(path, method='GET', body=null) {
+  const token = localStorage.getItem('rcm_token') || '';
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res  = await fetch(API_BASE + path, opts);
+    const data = await res.json();
+    if (res.status === 401) {
+      localStorage.removeItem('rcm_token');
+      localStorage.removeItem('rcm_user');
+      window.location.href = 'signin.html';
+      return null;
+    }
+    return data;
+  } catch(e) {
+    console.error('API error:', e);
+    return null;
+  }
+}
+
+// ── Bootstrap: load real dashboard data ──────────────────
+async function loadDashboardData() {
+  try {
+    const d = await api('/dashboard.php');
+    if (!d || !d.success) {
+      // Token invalid — fallback to stored user info if any
+      const stored = JSON.parse(localStorage.getItem('rcm_user') || '{}');
+      applyUserToUI(stored.first_name || '?', stored.last_name || '', stored.role || 'member');
+      return;
+    }
+
+    // ── User info ────────────────────────────────────────
+    const u = d.user;
+    localStorage.setItem('rcm_user', JSON.stringify(u)); // cache for offline
+    applyUserToUI(u.first_name, u.last_name, u.experience || u.role || 'member');
+
+    // Pre-fill settings panel
+    const fn = document.getElementById('set-fn'); if(fn) fn.value = u.first_name;
+    const ln = document.getElementById('set-ln'); if(ln) ln.value = u.last_name;
+    const se = document.getElementById('set-email'); if(se) se.value = u.email;
+    const sp = document.getElementById('set-phone'); if(sp) sp.value = u.phone || '';
+
+    // ── Balance & stats — ONLY real values, zero if new ──
+    balance = parseFloat(d.balance) || 0;
+    pnl     = parseFloat(d.unrealised_pnl) || 0;
+
+    // Dep/withdraw balance displays
+    const depBal = document.getElementById('dep-balance');
+    if(depBal) depBal.textContent = fmtUSD(balance);
+    const availWd = document.getElementById('avail-withdraw');
+    const available = parseFloat(d.available) || 0;
+    if(availWd) availWd.textContent = fmtUSD(available);
+
+    // ── Positions from real DB ────────────────────────────
+    positions.length = 0;
+    if (d.positions && d.positions.length) {
+      d.positions.forEach(p => {
+        positions.push({
+          id:    p.uuid,
+          sym:   p.symbol,
+          side:  p.direction === 'long' ? 'BUY' : 'SELL',
+          entry: parseFloat(p.open_price),
+          size:  parseFloat(p.margin_used),
+          pnl:   parseFloat(p.unrealised_pnl) || 0
+        });
+      });
+    }
+
+    // ── Trade history from real DB ────────────────────────
+    historyData.length = 0;
+    if (d.history && d.history.length) {
+      d.history.forEach(t => {
+        historyData.push({
+          date:  (t.closed_at||'').replace('T',' ').substring(0,16),
+          pair:  t.symbol,
+          side:  t.direction === 'long' ? 'BUY' : 'SELL',
+          entry: parseFloat(t.open_price),
+          exit:  parseFloat(t.close_price || t.open_price),
+          size:  parseFloat(t.margin_used),
+          pnl:   parseFloat(t.realised_pnl || 0)
+        });
+      });
+    }
+
+    // ── Transactions from real DB ─────────────────────────
+    txData.length = 0;
+    if (d.transactions && d.transactions.length) {
+      d.transactions.forEach(t => {
+        txData.push({
+          type:   t.type === 'deposit' ? 'Deposit' : 'Withdraw',
+          amount: (parseFloat(t.amount) >= 0 ? '+' : '') + fmtUSD(Math.abs(parseFloat(t.amount))),
+          status: t.status.charAt(0).toUpperCase() + t.status.slice(1),
+          date:   (t.created_at||'').split(' ')[0]
+        });
+      });
+    }
+
+    // ── Stats from real DB ────────────────────────────────
+    const ts = d.trade_stats || { total: 0, win_rate: 0 };
+    const tradesEl = document.querySelector('.stat-card:last-child .stat-value');
+    if(tradesEl) tradesEl.textContent = ts.total || 0;
+    const tradeSub = document.querySelector('.stat-card:last-child .stat-sub');
+    if(tradeSub) tradeSub.textContent = (ts.win_rate || 0) + '% win rate';
+
+    // ── Also update margin stat card ────────────────────
+    const marginEl = document.getElementById('stat-margin');
+    if(marginEl) marginEl.textContent = fmtUSD(available);
+
+    // ── Re-render with real data ──────────────────────────
+    updateStatCards();
+    renderPositions();
+    renderRecentTrades();
+    renderHistory();
+    renderTransactions();
+    renderNotifSettings();
+
+  } catch(e) {
+    console.warn('Dashboard load error:', e);
+    // Show stored user at minimum
+    const stored = JSON.parse(localStorage.getItem('rcm_user') || '{}');
+    if (stored.first_name) applyUserToUI(stored.first_name, stored.last_name || '', stored.role || 'member');
+  }
+}
+
+function applyUserToUI(fn, ln, role) {
+  const initials = ((fn||'?')[0] + (ln||'')[0]).toUpperCase();
+  const fullName = (fn + ' ' + ln).trim() || 'User';
+  const el_av   = document.getElementById('sidebarAvatar');
+  const el_name = document.getElementById('sidebarName');
+  const el_role = document.getElementById('sidebarRole');
+  if(el_av)   el_av.textContent   = initials;
+  if(el_name) el_name.textContent = fullName;
+  if(el_role) el_role.textContent = (role.charAt(0).toUpperCase() + role.slice(1)) + ' Account';
+}
+
+function fmtUSD(v) {
+  return '$' + (parseFloat(v)||0).toLocaleString('en',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+// ── Override placeOrder to call real API ──────────────────
+async function placeOrder() {
+  const mkt   = document.getElementById('orderMarket');
+  const price = parseFloat(mkt.value);
+  const amt   = parseFloat(document.getElementById('orderAmount').value)||0;
+  const lev   = parseFloat(document.getElementById('leverageSlider').value);
+  const sym   = mkt.options[mkt.selectedIndex].text.split(' — ')[0];
+  const sl    = parseFloat(document.getElementById('orderSL')?.value||0)||null;
+  const tp    = parseFloat(document.getElementById('orderTP')?.value||0)||null;
+  if(amt<10)      { showToast('Minimum order size is $10','error'); return; }
+  if(amt>balance) { showToast('Insufficient balance','error'); return; }
+
+  const d = await api('/trades.php', 'POST', {
+    symbol: sym, direction: orderSide==='buy'?'long':'short',
+    quantity: amt/price, leverage: lev,
+    stop_loss: sl, take_profit: tp
+  });
+  if (!d) return;
+  if (!d.success) { showToast(d.error || 'Order failed', 'error'); return; }
+
+  // Optimistically update UI
+  const newPnl = 0;
+  positions.push({ id: d.trade_uuid, sym, side: orderSide==='buy'?'BUY':'SELL', entry:price, size:amt, pnl:newPnl });
+  balance -= (d.margin_used || amt);
+  updateStatCards();
+  renderPositions();
+  showToast(`${orderSide==='buy'?'Long':'Short'} ${sym} opened at ${formatPrice(price)}`, 'success');
+}
+
+// ── Override closePosition to call real API ───────────────
+async function closePosition(i) {
+  const p = positions[i];
+  if (!p) return;
+
+  if (p.id) {
+    const d = await api('/trades.php', 'PUT', { trade_uuid: p.id });
+    if (!d) return;
+    if (!d.success) { showToast(d.error || 'Could not close trade','error'); return; }
+    const realPnl = d.realised_pnl || p.pnl;
+    balance += (p.size + realPnl);
+    showToast(`${p.sym} closed — P&L: ${realPnl>=0?'+':''}${fmtUSD(realPnl)}`, realPnl>=0?'success':'error');
+  } else {
+    balance += p.pnl;
+    showToast(`${p.sym} closed — P&L: ${p.pnl>=0?'+':''}${fmtUSD(p.pnl)}`, p.pnl>=0?'success':'error');
+  }
+  positions.splice(i,1);
+  renderPositions();
+  updateStatCards();
+}
+
+// ── Override saveProfile to call real API ─────────────────
+async function saveProfile() {
+  const fn = document.getElementById('set-fn')?.value?.trim() || '';
+  const ln = document.getElementById('set-ln')?.value?.trim() || '';
+  if (!fn) { showToast('First name is required','error'); return; }
+  const d = await api('/dashboard.php?action=update_profile', 'POST', { first_name: fn, last_name: ln });
+  if (d && !d.success) { showToast(d.error || 'Update failed','error'); return; }
+  applyUserToUI(fn, ln, document.getElementById('sidebarRole')?.textContent?.replace(' Account','') || 'member');
+  const stored = JSON.parse(localStorage.getItem('rcm_user')||'{}');
+  stored.first_name = fn; stored.last_name = ln;
+  localStorage.setItem('rcm_user', JSON.stringify(stored));
+  showToast('Profile updated successfully','success');
+}
+
+// ── Override changePassword to call real API ──────────────
+async function changePassword() {
+  const cur = document.getElementById('pw-current')?.value || '';
+  const nw  = document.getElementById('pw-new')?.value     || '';
+  const con = document.getElementById('pw-confirm')?.value || '';
+  if (!cur) { showToast('Enter your current password','error'); return; }
+  if (nw.length < 8 || !/[A-Z]/.test(nw) || !/[0-9]/.test(nw)) {
+    showToast('New password must be 8+ chars with uppercase and number','error'); return;
+  }
+  if (nw !== con) { showToast('Passwords do not match','error'); return; }
+  const d = await api('/dashboard.php?action=change_password', 'POST', { current_password: cur, new_password: nw });
+  if (d && !d.success) { showToast(d.error || 'Password change failed','error'); return; }
+  document.getElementById('pwModal').style.display='none';
+  showToast('Password changed successfully','success');
+}
+
+// ── Override handleDeposit to call real API ───────────────
+async function handleDeposit() {
+  const amtEl = document.getElementById('depositAmount');
+  const amt   = parseFloat(amtEl?.value || 0);
+  if (!amt || amt < 50) { showToast('Minimum deposit is $50','error'); return; }
+  const method = document.querySelector('#depositStep2 .method-card.active span')?.textContent || 'Crypto';
+  const d = await api('/dashboard.php?action=deposit_submit', 'POST', { amount: amt, method });
+  if (d && !d.success) { showToast(d.error || 'Submission failed','error'); return; }
+  txData.unshift({ type:'Deposit', amount:`+${fmtUSD(amt)}`, status:'Pending', date: new Date().toISOString().split('T')[0] });
+  sendAdminNotification({ type:'deposit', user: document.getElementById('sidebarName')?.textContent||'User', amount: amt, method, status:'Pending Confirmation', time: new Date().toISOString() });
+  renderTransactions();
+  showToast(`Deposit of ${fmtUSD(amt)} submitted — admin will verify & credit your account`, 'success');
+  setTimeout(() => { goBackToStep1(); document.getElementById('depositAmountStep1').value=''; }, 800);
+}
+
+// ── Override handleWithdraw to call real API ──────────────
+async function handleWithdraw() {
+  const amt  = parseFloat(document.getElementById('withdrawAmount')?.value || 0);
+  const addr = document.getElementById('wdAddress')?.value?.trim() || '';
+  if (!amt || amt < 100) { showToast('Minimum withdrawal is $100','error'); return; }
+  if (!addr)             { showToast('Please enter a wallet address or bank account','error'); return; }
+  if (amt > balance)     { showToast('Insufficient available balance','error'); return; }
+  const d = await api('/dashboard.php?action=withdraw', 'POST', { amount: amt, method: currentWdMethod, address: addr });
+  if (d && !d.success) { showToast(d.error || 'Withdrawal failed','error'); return; }
+  balance -= amt;
+  txData.unshift({ type:'Withdraw', amount:`-${fmtUSD(amt)}`, status:'Pending', date: new Date().toISOString().split('T')[0] });
+  sendAdminNotification({ type:'withdraw', user: document.getElementById('sidebarName')?.textContent||'User', amount: amt, method: currentWdMethod, time: new Date().toISOString() });
+  updateStatCards(); renderTransactions();
+  showToast(`Withdrawal of ${fmtUSD(amt)} submitted — email confirmation sent.`, 'success');
+  document.getElementById('withdrawAmount').value = '';
+  document.getElementById('wdAddress').value = '';
+  updateWdSummary();
+}
+
+// ── Override sendSupportMessage to call real API ──────────
+async function sendSupportMessage() {
+  const subject = document.getElementById('msgSubject')?.value?.trim() || '';
+  const body    = document.getElementById('msgBody')?.value?.trim() || '';
+  if (!subject) { showToast('Please enter a subject','error'); return; }
+  if (!body)    { showToast('Please enter a message','error'); return; }
+  const d = await api('/dashboard.php?action=message', 'POST', { subject, body });
+  if (d && !d.success) { showToast(d.error || 'Could not send message','error'); return; }
+  const msg = { id: Date.now(), subject, body, time: new Date().toISOString() };
+  const msgs = JSON.parse(localStorage.getItem('rcm_messages')||'[]');
+  msgs.unshift(msg);
+  localStorage.setItem('rcm_messages', JSON.stringify(msgs));
+  sendAdminNotification({ type:'support_message', user: document.getElementById('sidebarName')?.textContent||'User', subject, body, time: msg.time });
+  renderMessageHistory();
+  document.getElementById('msgSubject').value = '';
+  document.getElementById('msgBody').value = '';
+  showToast('Message sent to support team', 'success');
+}
+
+// ── Override confirmLogout ────────────────────────────────
+function confirmLogout() {
+  if (confirm('Sign out?')) {
+    api('/logout.php', 'POST').catch(()=>{});
+    localStorage.removeItem('rcm_token');
+    localStorage.removeItem('rcm_user');
+    showToast('Signing out...','info');
+    setTimeout(() => { window.location.href = 'signin.html'; }, 1000);
+  }
+}
+
+// ── Mobile sidebar toggle ─────────────────────────────────
+(function initMobileSidebar() {
+  const burger  = document.getElementById('dashBurger');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!burger || !sidebar) return;
+
+  function openSidebar() {
+    sidebar.classList.add('mobile-open');
+    if(overlay) overlay.classList.add('open');
+    burger.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSidebar() {
+    sidebar.classList.remove('mobile-open');
+    if(overlay) overlay.classList.remove('open');
+    burger.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  burger.addEventListener('click', () => {
+    sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+  });
+  if(overlay) overlay.addEventListener('click', closeSidebar);
+
+  // Close sidebar when a nav item is clicked on mobile
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.innerWidth <= 800) closeSidebar();
+    });
+  });
+})();
+
+// ── DOMContentLoaded bootstrap ────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadDashboardData();
+  renderMessageHistory();
+  const firstDepCard = document.querySelector('#depMethodGrid .method-card');
+  if (firstDepCard) selectDepMethod(firstDepCard, 'BTC');
+  renderNotifSettings();
+  const saved = localStorage.getItem('rcm_theme');
+  if (saved) setTheme(saved, false);
+});
+
+</script>
+
+</body>
+</html>

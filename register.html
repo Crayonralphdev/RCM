@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create Account | Retro Clurix Miners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#050a18;--surface:#0e1525;--surface2:#151f32;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--gold:#f0c040;--gold-glow:rgba(240,192,64,0.12);--green:#1fd98a;--red:#f05565;--text:#e2e6f0;--text2:#8892aa;--text3:#4a5468;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace}
+html{height:100%}body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font-body);display:flex;overflow:hidden}
+.brand-panel{width:44%;min-width:420px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:48px;position:relative;overflow:hidden}
+.brand-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 30% 50%,rgba(240,192,64,.07),transparent 65%);pointer-events:none}
+.brand-panel::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.brand-logo{font-family:var(--font-head);font-size:22px;font-weight:800;letter-spacing:-.5px;position:relative;z-index:1;text-decoration:none;color:var(--text)}.brand-logo span{color:var(--gold)}
+.brand-center{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}
+.brand-headline{font-family:var(--font-head);font-size:clamp(30px,3vw,46px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:20px}
+.brand-headline em{color:var(--gold);font-style:normal}
+.brand-sub{color:var(--text2);font-size:15px;line-height:1.7;max-width:340px;margin-bottom:36px}
+.perks{display:flex;flex-direction:column;gap:14px;margin-bottom:36px}
+.perk{display:flex;align-items:flex-start;gap:12px}
+.perk-icon{width:32px;height:32px;border-radius:8px;background:var(--gold-glow);border:1px solid rgba(240,192,64,.2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:2px}
+.perk-text strong{display:block;font-size:14px;font-weight:700;margin-bottom:2px}
+.perk-text span{font-size:12px;color:var(--text2)}
+.trust-row{display:flex;gap:12px;flex-wrap:wrap}
+.trust-badge{display:flex;align-items:center;gap:7px;padding:8px 14px;background:rgba(31,217,138,.06);border:1px solid rgba(31,217,138,.15);border-radius:8px;font-size:12px;font-weight:600;color:var(--green)}
+.brand-footer{position:relative;z-index:1;margin-top:auto}.brand-footer p{font-size:12px;color:var(--text3)}
+.form-panel{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 32px;overflow-y:auto}
+.form-box{width:100%;max-width:440px}
+.steps{display:flex;margin-bottom:28px;background:var(--surface);border-radius:10px;padding:4px;gap:4px}
+.step{flex:1;padding:8px 4px;border-radius:7px;text-align:center;font-size:12px;font-weight:700;color:var(--text3);transition:all .2s;line-height:1.4}
+.step.active{background:var(--gold-glow);color:var(--gold);border:1px solid rgba(240,192,64,.25)}
+.step.done{color:var(--green)}
+.form-top{margin-bottom:24px}.form-top h1{font-family:var(--font-head);font-size:26px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+.form-top p{color:var(--text2);font-size:14px}.form-top p a{color:var(--gold);font-weight:600}
+.social-btns{display:flex;gap:10px;margin-bottom:20px}
+.social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font-body)}
+.social-btn:hover{border-color:rgba(240,192,64,.3);background:var(--gold-glow)}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.divider span{font-size:12px;color:var(--text3);white-space:nowrap}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);font-weight:700;margin-bottom:6px}
+.field-wrap{position:relative}
+.field input,.field select{width:100%;padding:12px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(240,192,64,.08)}
+.field input::placeholder{color:var(--text3)}
+.field-icon{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:15px;cursor:pointer;color:var(--text3)}
+.field-error{font-size:12px;color:var(--red);margin-top:5px;display:none}
+.field.has-error input,.field.has-error select{border-color:var(--red)}
+.field.has-error .field-error{display:block}
+.field-hint{font-size:11px;color:var(--text3);margin-top:4px}
+.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.strength-bar{height:4px;background:var(--surface2);border-radius:99px;margin-top:8px;overflow:hidden}
+.strength-fill{height:100%;width:0;border-radius:99px;transition:width .3s,background .3s}
+.strength-label{font-size:11px;color:var(--text3);margin-top:4px}
+.check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px}
+.check-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);cursor:pointer;margin-top:2px;flex-shrink:0}
+.check-row label{font-size:12px;color:var(--text2);line-height:1.5;cursor:pointer}
+.check-row label a{color:var(--gold)}
+.btn-main{width:100%;padding:14px;border-radius:9px;border:none;background:var(--gold);color:#0a0a0a;font-family:var(--font-head);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-main:hover:not(:disabled){background:#ffd560;transform:translateY(-1px);box-shadow:0 8px 24px rgba(240,192,64,.3)}
+.btn-main:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-back{width:100%;padding:11px;border-radius:9px;border:1.5px solid var(--border2);background:none;color:var(--text2);font-family:var(--font-head);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-back:hover{color:var(--text)}
+.spinner{width:18px;height:18px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;display:none;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.form-footer{text-align:center;margin-top:14px;font-size:13px;color:var(--text2)}.form-footer a{color:var(--gold);font-weight:600}
+.err-banner{background:rgba(240,85,101,.1);border:1px solid rgba(240,85,101,.3);color:var(--red);border-radius:9px;padding:12px 16px;font-size:13px;margin-bottom:16px;display:none;line-height:1.5}
+.step-content{display:none}.step-content.active{display:block}
+.otp-row{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+.otp-box{width:48px;height:56px;text-align:center;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:22px;font-weight:700;outline:none;transition:border-color .2s,box-shadow .2s}
+.otp-box:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(240,192,64,.1)}
+.otp-box.ok{border-color:rgba(31,217,138,.4);background:rgba(31,217,138,.04)}
+.otp-box.bad{border-color:var(--red)}
+.demo-note{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+.success-wrap{display:none;flex-direction:column;align-items:center;text-align:center;padding:20px 0}
+.success-check{width:80px;height:80px;border-radius:50%;background:rgba(31,217,138,.1);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 24px;animation:pop .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes pop{from{scale:0;opacity:0}to{scale:1;opacity:1}}
+@media(max-width:860px){.brand-panel{display:none}.form-panel{padding:28px 16px}}
+</style>
+  <style>
+
+    /* ═══════════════════════════════════════════════════════
+       RCM  —  Unified Navigation  (injected)
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      --nav-h: 68px;
+      --bg:        #050a18;
+      --surface:   #0c1428;
+      --border:    rgba(255,255,255,0.08);
+      --gold:      #f0c040;
+      --gold-dim:  #c89e20;
+      --text:      #e8eaf0;
+      --muted:     #7b8299;
+      --green:     #22d98a;
+      --red:       #f05a5a;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius:    12px;
+    }
+
+    /* ── Google Fonts  ──────────────────────────────────── */
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+    /* ── Base header  ──────────────────────────────────── */
+    header.rcm-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      height: var(--nav-h);
+      background: rgba(5,10,24,0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      transition: background .3s;
+    }
+    header.rcm-header.scrolled { background: rgba(5,10,24,0.98); }
+
+    .rcm-nav {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    /* ── Logo ──────────────────────────────────────────── */
+    .rcm-logo {
+      font-family: var(--font-head);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .rcm-logo span { color: var(--gold); }
+
+    /* ── Desktop links ─────────────────────────────────── */
+    .rcm-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+    .rcm-links > li > a {
+      display: block;
+      padding: 8px 13px;
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+      white-space: nowrap;
+    }
+    .rcm-links > li > a:hover,
+    .rcm-links > li.active > a { color: var(--text); background: rgba(255,255,255,.06); }
+
+    /* ── Dropdown ──────────────────────────────────────── */
+    .rcm-drop { position: relative; }
+    .rcm-drop > a::after { content: ' ▾'; font-size: 10px; opacity: .6; }
+
+    .rcm-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 0;
+      list-style: none;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      z-index: 10000;
+    }
+    .rcm-dropdown li a {
+      display: block;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+    }
+    .rcm-dropdown li a:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .rcm-drop:hover .rcm-dropdown { display: block; }
+
+    /* ── Actions ───────────────────────────────────────── */
+    .rcm-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .rcm-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .rcm-btn-ghost {
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+    }
+    .rcm-btn-ghost:hover { background: rgba(255,255,255,.13); }
+    .rcm-btn-primary {
+      background: var(--gold);
+      color: #0a0a0a;
+    }
+    .rcm-btn-primary:hover { background: #ffd560; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(240,192,64,.28); }
+
+    /* ── Burger ────────────────────────────────────────── */
+    .rcm-burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+    .rcm-burger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform .3s, opacity .3s, width .3s;
+    }
+    /* X animation */
+    .rcm-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .rcm-burger.open span:nth-child(2) { opacity: 0; width: 0; }
+    .rcm-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile drawer ─────────────────────────────────── */
+    .rcm-mobile {
+      display: none;
+      position: fixed;
+      inset: var(--nav-h) 0 0 0;
+      background: var(--bg);
+      z-index: 9998;
+      overflow-y: auto;
+      padding: 20px 20px 32px;
+      flex-direction: column;
+      gap: 0;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    .rcm-mobile.open {
+      display: flex;
+      transform: translateX(0);
+    }
+
+    /* accordion sections */
+    .rcm-mob-section { border-bottom: 1px solid var(--border); }
+    .rcm-mob-section summary {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+    .rcm-mob-section summary::-webkit-details-marker { display: none; }
+    .rcm-mob-section summary .chevron {
+      font-size: 12px;
+      opacity: .5;
+      transition: transform .25s;
+    }
+    .rcm-mob-section[open] summary .chevron { transform: rotate(180deg); }
+    .rcm-mob-section ul { list-style: none; padding: 4px 0 12px; margin: 0; }
+    .rcm-mob-section ul li a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .rcm-mob-section ul li a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+
+    .rcm-mob-plain {
+      display: block;
+      padding: 16px 0;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .rcm-mob-plain:hover { color: var(--gold); }
+
+    .rcm-mob-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .rcm-mob-actions .rcm-btn { justify-content: center; }
+
+    /* ── Responsive breakpoints ────────────────────────── */
+    @media (max-width: 960px) {
+      .rcm-links, .rcm-actions { display: none; }
+      .rcm-burger { display: flex; }
+    }
+    @media (max-width: 480px) {
+      .rcm-logo { font-size: 16px; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ═══ RCM Unified Nav ════════════════════════════════════ -->
+<header class="rcm-header" id="rcmHeader">
+  <nav class="rcm-nav">
+    <a href="index.html" class="rcm-logo">Retro Clurix <span>Miners</span></a>
+
+    <ul class="rcm-links">
+      <li class="rcm-drop">
+        <a href="#">Products</a>
+        <ul class="rcm-dropdown">
+          <li><a href="platform-1.html">Margin Trading</a></li>
+          <li><a href="covesting-1.html">Copy-Trading</a></li>
+          <li><a href="buy-crypto.html">Buy Crypto</a></li>
+          <li><a href="contests.html">Trading Contests</a></li>
+          <li><a href="trading-academy.html">Academy</a></li>
+        </ul>
+      </li>
+      <li class="rcm-drop">
+        <a href="#">Markets</a>
+        <ul class="rcm-dropdown">
+          <li><a href="cryptocurrency-margin-trading-1.html">Cryptocurrencies</a></li>
+          <li><a href="forex-trading-1.html">Forex</a></li>
+          <li><a href="commodities-trading-1.html">Commodities</a></li>
+          <li><a href="gold-trading-1.html">Gold Trading</a></li>
+          <li><a href="index-trading-1.html">Stock Indices</a></li>
+          <li><a href="leverage-trading-crypto-indices-forex-1.html">All Instruments</a></li>
+        </ul>
+      </li>
+      <li class="rcm-drop">
+        <a href="#">Company</a>
+        <ul class="rcm-dropdown">
+          <li><a href="about-1.html">About Us</a></li>
+          <li><a href="security-1.html">Security</a></li>
+          <li><a href="fees-1.html">Fees</a></li>
+          <li><a href="press-and-media-1.html">Press &amp; Media</a></li>
+          <li><a href="index-5.html">Help Center</a></li>
+        </ul>
+      </li>
+      <li><a href="platform.html">Platform</a></li>
+      <li><a href="ambassador-1.html">Refer &amp; Earn</a></li>
+    </ul>
+
+    <div class="rcm-actions">
+      <a href="signin.html" class="rcm-btn rcm-btn-ghost">Login</a>
+      <a href="register.html" class="rcm-btn rcm-btn-primary">Register</a>
+    </div>
+
+    <button class="rcm-burger" id="rcmBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- ═══ Mobile Drawer ═══════════════════════════════════════ -->
+<div class="rcm-mobile" id="rcmMobile" role="dialog" aria-label="Navigation menu">
+  <details class="rcm-mob-section">
+    <summary>Products <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="platform-1.html">Margin Trading</a></li>
+      <li><a href="covesting-1.html">Copy-Trading</a></li>
+      <li><a href="buy-crypto.html">Buy Crypto</a></li>
+      <li><a href="contests.html">Trading Contests</a></li>
+      <li><a href="trading-academy.html">Academy</a></li>
+    </ul>
+  </details>
+  <details class="rcm-mob-section">
+    <summary>Markets <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="cryptocurrency-margin-trading-1.html">Cryptocurrencies</a></li>
+      <li><a href="forex-trading-1.html">Forex</a></li>
+      <li><a href="commodities-trading-1.html">Commodities</a></li>
+      <li><a href="gold-trading-1.html">Gold Trading</a></li>
+      <li><a href="index-trading-1.html">Stock Indices</a></li>
+      <li><a href="leverage-trading-crypto-indices-forex-1.html">All Instruments</a></li>
+    </ul>
+  </details>
+  <details class="rcm-mob-section">
+    <summary>Company <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="about-1.html">About Us</a></li>
+      <li><a href="security-1.html">Security</a></li>
+      <li><a href="fees-1.html">Fees</a></li>
+      <li><a href="press-and-media-1.html">Press &amp; Media</a></li>
+      <li><a href="index-5.html">Help Center</a></li>
+    </ul>
+  </details>
+  <a href="platform.html" class="rcm-mob-plain">Platform</a>
+  <a href="ambassador-1.html" class="rcm-mob-plain">Refer &amp; Earn</a>
+  <div class="rcm-mob-actions">
+    <a href="signin.html" class="rcm-btn rcm-btn-ghost">Login</a>
+    <a href="register.html" class="rcm-btn rcm-btn-primary">Register</a>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════════════════════ -->
+
+
+<div class="brand-panel">
+  <a href="index.html" class="brand-logo">Retro Clurix <span>Miners</span></a>
+  <div class="brand-center">
+    <h2 class="brand-headline">Start your<br><em>trading journey.</em></h2>
+    <p class="brand-sub">Join over 1 million traders across 152 countries on the world's most powerful crypto trading platform.</p>
+    <div class="perks">
+      <div class="perk"><div class="perk-icon">🚀</div><div class="perk-text"><strong>Open in 2 minutes</strong><span>No complex verification — start trading immediately</span></div></div>
+      <div class="perk"><div class="perk-icon">💰</div><div class="perk-text"><strong>Zero deposit fees</strong><span>Fund your account for free via crypto or card</span></div></div>
+      <div class="perk"><div class="perk-icon">⚡</div><div class="perk-text"><strong>100+ markets</strong><span>Crypto, Forex, Commodities, Indices</span></div></div>
+      <div class="perk"><div class="perk-icon">🔒</div><div class="perk-text"><strong>Bank-grade security</strong><span>95% cold storage · 2FA · 256-bit SSL</span></div></div>
+    </div>
+    <div class="trust-row">
+      <div class="trust-badge">✓ SSL Secured</div>
+      <div class="trust-badge">✓ 2FA Protected</div>
+      <div class="trust-badge">✓ GDPR Compliant</div>
+    </div>
+  </div>
+  <div class="brand-footer"><p>Retro Clurix Miners Trading Services LLC · St. Vincent &amp; the Grenadines</p></div>
+</div>
+
+<div class="form-panel">
+  <div class="form-box">
+    <div class="steps" id="stepBar">
+      <div class="step active" id="s1">1<br><small>Account</small></div>
+      <div class="step" id="s2">2<br><small>Personal</small></div>
+      <div class="step" id="s3">3<br><small>Verify</small></div>
+    </div>
+    <div class="err-banner" id="errBanner"></div>
+
+    <!-- STEP 1 -->
+    <div class="step-content active" id="step1">
+      <div class="form-top"><h1>Create account</h1><p>Already have one? <a href="signin.html">Sign in →</a></p></div>
+      <div class="social-btns">
+        <button class="social-btn" onclick="socialFill('Google')">🔵 Google</button>
+        <button class="social-btn" onclick="socialFill('Apple')">🍎 Apple</button>
+      </div>
+      <div class="divider"><span>or register with email</span></div>
+      <div class="field" id="fEmail"><label>Email Address</label><div class="field-wrap"><input type="email" id="iEmail" placeholder="you@example.com" autocomplete="email"><span class="field-icon">✉️</span></div><div class="field-error">Please enter a valid email address.</div></div>
+      <div class="field" id="fPass"><label>Password</label><div class="field-wrap"><input type="password" id="iPass" placeholder="Min. 8 characters" oninput="strength(this.value)"><span class="field-icon" onclick="toggleVis('iPass',this)">👁️</span></div><div class="strength-bar"><div class="strength-fill" id="sBar"></div></div><div class="strength-label" id="sLabel">Enter a password</div><div class="field-error">Password must be at least 8 characters.</div></div>
+      <div class="field" id="fConfirm"><label>Confirm Password</label><div class="field-wrap"><input type="password" id="iConfirm" placeholder="Repeat password"><span class="field-icon" onclick="toggleVis('iConfirm',this)">👁️</span></div><div class="field-error">Passwords do not match.</div></div>
+      <div class="check-row"><input type="checkbox" id="chkTerms"><label for="chkTerms">I agree to the <a href="../../../fees-1.html" target="_blank">Terms of Service</a> and <a href="../../../security-1.html" target="_blank">Privacy Policy</a>. I am 18 years or older.</label></div>
+      <button class="btn-main" onclick="step1Next()"><span>Continue →</span></button>
+      <div class="form-footer">Already registered? <a href="signin.html">Sign in</a></div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-content" id="step2">
+      <div class="form-top"><h1>Personal details</h1><p style="color:var(--text2);font-size:14px">Tell us a bit about yourself.</p></div>
+      <div class="field-pair">
+        <div class="field" id="fFn"><label>First Name</label><input type="text" id="iFn" placeholder="John"><div class="field-error">Required.</div></div>
+        <div class="field" id="fLn"><label>Last Name</label><input type="text" id="iLn" placeholder="Doe"><div class="field-error">Required.</div></div>
+      </div>
+      <div class="field" id="fCountry"><label>Country</label><div class="field-wrap"><select id="iCountry"><option value="">Select your country...</option><option>United States</option><option>United Kingdom</option><option>Germany</option><option>France</option><option>Nigeria</option><option>South Africa</option><option>Brazil</option><option>India</option><option>Japan</option><option>Australia</option><option>Canada</option><option>Singapore</option><option>UAE</option><option>Other</option></select><span class="field-icon" style="pointer-events:none">🌍</span></div><div class="field-error">Please select your country.</div></div>
+      <div class="field"><label>Phone <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><div class="field-wrap"><input type="tel" id="iPhone" placeholder="+1 234 567 8900"><span class="field-icon">📱</span></div></div>
+      <div class="field"><label>Trading Experience</label><div class="field-wrap"><select id="iExp"><option value="beginner">Complete beginner</option><option value="some">Some experience (&lt;1 year)</option><option value="intermediate">Intermediate (1–3 years)</option><option value="experienced">Experienced (3+ years)</option><option value="professional">Professional trader</option></select></div></div>
+      <div class="field"><label>Referral Code <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label><div class="field-wrap"><input type="text" id="iRef" placeholder="e.g. AB12CD34"><span class="field-icon">🎁</span></div><div class="field-hint">Both you and your referrer earn a bonus.</div></div>
+      <button class="btn-main" id="btnS2" onclick="step2Submit()"><div class="spinner" id="spS2"></div><span id="txS2">Create Account →</span></button>
+      <button class="btn-back" onclick="goStep(1)">← Back</button>
+    </div>
+
+    <!-- STEP 3 OTP -->
+    <div class="step-content" id="step3">
+      <div class="form-top"><h1>Verify email</h1><p style="color:var(--text2);font-size:14px">6-digit code sent to <strong id="otpEmail" style="color:var(--gold)"></strong></p></div>
+      <div class="otp-row">
+        <input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="otpIn(this,0)" onkeydown="otpKey(this,0,event)">
+        <input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="otpIn(this,1)" onkeydown="otpKey(this,1,event)">
+        <input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="otpIn(this,2)" onkeydown="otpKey(this,2,event)">
+        <input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="otpIn(this,3)" onkeydown="otpKey(this,3,event)">
+        <input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="otpIn(this,4)" onkeydown="otpKey(this,4,event)">
+        <input type="text" inputmode="numeric" maxlength="1" class="otp-box" oninput="otpIn(this,5)" onkeydown="otpKey(this,5,event)">
+      </div>
+      <div style="text-align:center;margin-bottom:14px;font-size:13px;color:var(--text2)">Didn't get it? <button id="btnResend" onclick="resend()" style="background:none;border:none;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer">Resend</button><span id="timerWrap" style="color:var(--text3);display:none"> in <span id="timerNum">60</span>s</span></div>
+      <div class="demo-note">💡 <strong>Demo mode:</strong> Any 6-digit code works. On a live PHP server a real email is sent.</div>
+      <button class="btn-main" id="btnVerify" onclick="doVerify()"><div class="spinner" id="spVerify"></div><span id="txVerify">Verify &amp; Finish</span></button>
+      <button class="btn-back" onclick="goStep(2)">← Back</button>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-wrap" id="successWrap">
+      <div style="font-size:26px;margin-bottom:14px">🎉 🥳 🎊</div>
+      <div class="success-check">✓</div>
+      <h2 style="font-family:var(--font-head);font-size:24px;font-weight:800;margin-bottom:8px">Account Created!</h2>
+      <p id="welcomeMsg" style="color:var(--text2);font-size:14px;margin-bottom:6px"></p>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:28px">Taking you to your dashboard…</p>
+      <div style="width:100%;height:4px;background:var(--surface);border-radius:99px;overflow:hidden">
+        <div id="progBar" style="height:100%;width:0;background:var(--gold);border-radius:99px;transition:width 2.2s ease"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auto-detect API path — works in any subfolder (localhost/out/ or live root)
+const API = window.location.pathname.replace(/\/[^\/]*$/, '') + '/api';
+let curStep=1, vtToken=null;
+
+function g(id){return document.getElementById(id);}
+function showErr(m){const e=g('errBanner');e.innerHTML=m;e.style.display='block';e.scrollIntoView({block:'nearest'});}
+function hideErr(){g('errBanner').style.display='none';}
+function setLoading(b,s,t,on,txt=''){g(b).disabled=on;g(s).style.display=on?'block':'none';if(txt)g(t).textContent=txt;}
+function setErr(id){g(id).classList.add('has-error');}
+function clearErrs(...ids){ids.forEach(i=>g(i).classList.remove('has-error'));}
+
+function goStep(n){
+  curStep=n;
+  [1,2,3].forEach(i=>{
+    g('step'+i).classList.toggle('active',i===n);
+    const s=g('s'+i);
+    s.className='step'+(i===n?' active':i<n?' done':'');
+  });
+  hideErr();
+}
+
+function step1Next(){
+  const email=g('iEmail').value.trim(),pass=g('iPass').value,conf=g('iConfirm').value,terms=g('chkTerms').checked;
+  let ok=true; clearErrs('fEmail','fPass','fConfirm');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setErr('fEmail');ok=false;}
+  if(pass.length<8){setErr('fPass');ok=false;}
+  if(pass!==conf){setErr('fConfirm');ok=false;}
+  if(!terms){showErr('Please agree to the Terms of Service to continue.');ok=false;}
+  if(ok) goStep(2);
+}
+
+async function step2Submit(){
+  const fn=g('iFn').value.trim(),ln=g('iLn').value.trim(),country=g('iCountry').value;
+  let ok=true; clearErrs('fFn','fLn','fCountry');
+  if(!fn){setErr('fFn');ok=false;}
+  if(!ln){setErr('fLn');ok=false;}
+  if(!country){setErr('fCountry');ok=false;}
+  if(!ok) return;
+  setLoading('btnS2','spS2','txS2',true);
+  // no demo bypass — always call real API
+  try{
+    const r=await fetch(`${API}/register.php`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:g('iEmail').value.trim(),password:g('iPass').value,first_name:fn,last_name:ln,country,phone:g('iPhone').value.trim()||null,experience:g('iExp').value,referral_code:g('iRef').value.trim()||null})});
+    const d=await r.json();
+    if(!d.success){showErr(d.error||'Registration failed. Please try again.');}
+    else{
+      vtToken=d.verify_token||null;
+      afterReg();
+      // Auto-fill OTP on local dev if server returns it
+      if(d._dev_otp){
+        setTimeout(()=>{
+          const boxes=document.querySelectorAll('.otp-box');
+          d._dev_otp.toString().split('').forEach((c,i)=>{if(boxes[i]){boxes[i].value=c;boxes[i].classList.add('ok');}});
+          // Show notice
+          const notice=document.getElementById('errBanner');
+          if(notice){notice.style.background='#1a3a1a';notice.style.color='#1fd98a';notice.innerHTML='Dev mode: OTP auto-filled — '+d._dev_otp;notice.style.display='block';}
+        },400);
+      }
+    }
+  }catch(e){showErr('Error: ' + e.message + ' — URL: ' + `${API}/register.php`);console.error('Register error:',e);}
+  setLoading('btnS2','spS2','txS2',false,'Create Account →');
+}
+
+function afterReg(){
+  g('otpEmail').textContent=g('iEmail').value.trim();
+  goStep(3);startTimer();
+  setTimeout(()=>document.querySelectorAll('.otp-box')[0].focus(),100);
+  setLoading('btnS2','spS2','txS2',false,'Create Account →');
+}
+
+async function doVerify(){
+  const code=[...document.querySelectorAll('.otp-box')].map(b=>b.value).join('');
+  if(code.length<6){document.querySelectorAll('.otp-box').forEach(b=>{if(!b.value)b.classList.add('bad');});return;}
+  setLoading('btnVerify','spVerify','txVerify',true);
+
+  try{
+    const r=await fetch(`${API}/verify-otp.php`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({verify_token:vtToken, otp:code})});
+    const d=await r.json();
+    if(!d.success){showErr(d.error||'Verification failed. Please check the code and try again.');setLoading('btnVerify','spVerify','txVerify',false,'Verify & Finish');return;}
+    // verify-otp.php returns the session token directly — save it
+    if(d.token){localStorage.setItem('rcm_token',d.token);localStorage.setItem('rcm_user',JSON.stringify(d.user||{}));}
+    doSuccess();
+  }catch(e){showErr('Error: ' + e.message);console.error('Verify error:',e);setLoading('btnVerify','spVerify','txVerify',false,'Verify & Finish');}
+}
+
+function doSuccess(){
+  g('stepBar').style.display='none';
+  g('step'+curStep).classList.remove('active');
+  g('errBanner').style.display='none';
+  g('welcomeMsg').textContent=`Welcome aboard, ${g('iFn').value} ${g('iLn').value}!`;
+  const sw=g('successWrap');sw.style.display='flex';
+  setTimeout(()=>{g('progBar').style.width='100%';},80);
+  setTimeout(()=>{window.location.href='dashboard.html';},2700);
+}
+
+function otpIn(el,i){el.value=el.value.replace(/\D/g,'');el.classList.toggle('ok',!!el.value);el.classList.remove('bad');if(el.value&&i<5)document.querySelectorAll('.otp-box')[i+1].focus();if([...document.querySelectorAll('.otp-box')].every(b=>b.value))setTimeout(doVerify,280);}
+function otpKey(el,i,e){if(e.key==='Backspace'&&!el.value&&i>0){const prev=document.querySelectorAll('.otp-box')[i-1];prev.value='';prev.classList.remove('ok','bad');prev.focus();}}
+
+let timerInt;
+function startTimer(){clearInterval(timerInt);let t=60;g('btnResend').style.display='none';g('timerWrap').style.display='inline';g('timerNum').textContent=t;timerInt=setInterval(()=>{g('timerNum').textContent=--t;if(t<=0){clearInterval(timerInt);g('btnResend').style.display='inline';g('timerWrap').style.display='none';}},1000);}
+function resend(){document.querySelectorAll('.otp-box').forEach(b=>{b.value='';b.classList.remove('ok','bad');});document.querySelectorAll('.otp-box')[0].focus();startTimer();}
+
+function toggleVis(id,btn){const el=g(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁️':'🙈';}
+function strength(v){let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;const m=[[0,'#f05565','0%','Too short'],[1,'#f05565','25%','Weak'],[2,'#f0c040','50%','Fair'],[3,'#f0c040','75%','Good'],[4,'#1fd98a','100%','Strong ✓']];const[,c,w,t]=m[Math.min(s,4)];g('sBar').style.cssText=`width:${w};background:${c}`;const l=g('sLabel');l.textContent=t;l.style.color=c;}
+function socialFill(pv){goStep(2);g('iFn').value=pv==='Google'?'Demo':'Apple';g('iLn').value='User';g('iEmail').value='demo@example.com';g('iPass').value='Demo1234!';g('iConfirm').value='Demo1234!';g('chkTerms').checked=true;}
+const p=ms=>new Promise(r=>setTimeout(r,ms));
+</script>
+
+<script>
+(function(){
+  /* ── Burger toggle ── */
+  var burger = document.getElementById('rcmBurger');
+  var mobile = document.getElementById('rcmMobile');
+  var header = document.getElementById('rcmHeader');
+  if(burger && mobile){
+    burger.addEventListener('click', function(){
+      var open = mobile.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    // Close on outside click
+    document.addEventListener('click', function(e){
+      if(mobile.classList.contains('open') && !mobile.contains(e.target) && !burger.contains(e.target)){
+        mobile.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+      }
+    });
+    // Close on nav link click
+    mobile.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        mobile.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+  /* ── Scroll shadow ── */
+  if(header){
+    window.addEventListener('scroll', function(){
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, {passive:true});
+  }
+  /* ── Active link highlight ── */
+  var page = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.rcm-links a, .rcm-mobile a').forEach(function(a){
+    if(a.getAttribute('href') === page) a.closest('li') && a.closest('li').classList.add('active');
+  });
+})();
+</script>
+
+</body>
+</html>

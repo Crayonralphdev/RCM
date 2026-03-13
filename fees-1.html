@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fees & Conditions | Retro Clurix Miners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050a18;--bg2:#0c1428;--surface:#131827;--surface2:#1a2035;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#f0c040;--gold-glow:rgba(240,192,64,0.12);
+  --green:#1fd98a;--red:#f05565;--blue:#3d9cf0;
+  --text:#e2e6f0;--text2:#8892aa;--text3:#4a5468;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --radius:12px;--max-w:1200px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 24px}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:8px;font-family:var(--font-head);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:none}
+.btn-primary{background:var(--gold);color:#0a0a0a}
+.btn-primary:hover{background:#ffd560;transform:translateY(-1px);box-shadow:0 8px 24px rgba(240,192,64,.3)}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border2)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--text)}
+.btn-ghost:hover{background:rgba(255,255,255,.12)}
+/* Nav */
+header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(5,10,24,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+.nav-logo{font-family:var(--font-head);font-size:19px;font-weight:800;letter-spacing:-.5px}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none}
+.nav-links a{padding:8px 13px;border-radius:6px;font-size:13.5px;color:var(--text2);transition:color .15s,background .15s}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.nav-dropdown{position:relative}
+.nav-dropdown>a::after{content:' ▾';font-size:9px;opacity:.5}
+.dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;min-width:200px;list-style:none;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.nav-dropdown:hover .dropdown-menu{display:block}
+.dropdown-menu li a{display:block;padding:9px 14px;border-radius:6px;font-size:13px;color:var(--text2)}
+.dropdown-menu li a:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.nav-actions{display:flex;gap:8px;align-items:center}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.burger span,.burger::before,.burger::after{display:block;width:22px;height:2px;background:var(--text);border-radius:2px}
+/* Mobile menu */
+.mobile-menu{display:none;position:fixed;inset:68px 0 0 0;background:var(--bg);z-index:99;overflow-y:auto;padding:20px;flex-direction:column;gap:6px}
+.mobile-menu.open{display:flex}
+.mob-section summary{list-style:none;display:flex;justify-content:space-between;padding:13px 0;font-family:var(--font-head);font-weight:700;border-bottom:1px solid var(--border);cursor:pointer}
+.mob-section summary::-webkit-details-marker{display:none}
+.mob-section ul{list-style:none;padding:8px 0}
+.mob-section ul li a{display:block;padding:9px 14px;color:var(--text2);font-size:14px}
+.mob-actions{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.mob-actions .btn{justify-content:center;width:100%}
+/* Sections */
+.pt-nav{padding-top:68px}
+section{padding:88px 0}
+.section-tag{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.section-title{font-family:var(--font-head);font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1px;margin-bottom:14px}
+.section-sub{font-size:17px;color:var(--text2);max-width:580px;line-height:1.7}
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--border2)}
+/* Hero shared */
+.page-hero{min-height:52vh;display:flex;align-items:center;padding-top:68px;position:relative;overflow:hidden}
+.page-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 60% 50%,rgba(240,192,64,.06),transparent 65%)}
+.page-hero-bg::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px}
+.page-hero-content{position:relative;z-index:1;max-width:700px}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.2);color:var(--gold);font-size:12px;font-weight:600;padding:5px 14px;border-radius:99px;margin-bottom:20px}
+/* Grid helpers */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+/* CTA strip */
+.cta-strip{background:linear-gradient(135deg,#0f1d3a,#1a1200);border-radius:18px;padding:56px 48px;text-align:center;border:1px solid rgba(240,192,64,.15)}
+.cta-strip h2{font-family:var(--font-head);font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-1px;margin-bottom:12px}
+.cta-strip p{color:var(--text2);font-size:16px;margin-bottom:28px}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* Feature icon */
+.feat-icon{width:52px;height:52px;border-radius:12px;background:var(--gold-glow);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px}
+/* Table */
+.styled-table{width:100%;border-collapse:collapse;font-size:14px}
+.styled-table th{text-align:left;padding:10px 16px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);border-bottom:1px solid var(--border);font-weight:700}
+.styled-table td{padding:14px 16px;border-bottom:1px solid var(--border)}
+.styled-table tr:hover td{background:var(--surface2)}
+.styled-table tr:last-child td{border-bottom:none}
+/* Badge */
+.badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:99px;font-weight:700}
+.badge-green{background:rgba(31,217,138,.12);color:var(--green)}
+.badge-gold{background:var(--gold-glow);color:var(--gold)}
+.badge-red{background:rgba(240,85,101,.12);color:var(--red)}
+/* Footer */
+footer{background:var(--surface);border-top:1px solid var(--border);padding:56px 0 28px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:36px;margin-bottom:40px}
+.footer-brand .nav-logo{font-size:17px}
+.footer-brand p{font-size:13px;color:var(--text2);margin:10px 0 20px;max-width:220px}
+.footer-socials{display:flex;gap:8px;flex-wrap:wrap}
+.social-btn{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:15px;transition:background .2s}
+.social-btn:hover{background:rgba(240,192,64,.15)}
+.footer-col h4{font-family:var(--font-head);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:14px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.footer-col ul a{font-size:13px;color:var(--text2);transition:color .2s}
+.footer-col ul a:hover{color:var(--text)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+.footer-bottom p{font-size:11px;color:var(--text3);max-width:680px;line-height:1.6}
+.footer-copyright{font-size:12px;color:var(--text3);white-space:nowrap}
+/* Responsive */
+@media(max-width:900px){.nav-links,.nav-actions{display:none}.burger{display:flex}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.cta-strip{padding:36px 20px}}
+@media(max-width:600px){.footer-grid{grid-template-columns:1fr}section{padding:60px 0}}
+</style>
+  <style>
+
+    /* ═══════════════════════════════════════════════════════
+       RCM  —  Unified Navigation  (injected)
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      --nav-h: 68px;
+      --bg:        #050a18;
+      --surface:   #0c1428;
+      --border:    rgba(255,255,255,0.08);
+      --gold:      #f0c040;
+      --gold-dim:  #c89e20;
+      --text:      #e8eaf0;
+      --muted:     #7b8299;
+      --green:     #22d98a;
+      --red:       #f05a5a;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius:    12px;
+    }
+
+    /* ── Google Fonts  ──────────────────────────────────── */
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+    /* ── Base header  ──────────────────────────────────── */
+    header.rcm-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      height: var(--nav-h);
+      background: rgba(5,10,24,0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      transition: background .3s;
+    }
+    header.rcm-header.scrolled { background: rgba(5,10,24,0.98); }
+
+    .rcm-nav {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    /* ── Logo ──────────────────────────────────────────── */
+    .rcm-logo {
+      font-family: var(--font-head);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .rcm-logo span { color: var(--gold); }
+
+    /* ── Desktop links ─────────────────────────────────── */
+    .rcm-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+    .rcm-links > li > a {
+      display: block;
+      padding: 8px 13px;
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+      white-space: nowrap;
+    }
+    .rcm-links > li > a:hover,
+    .rcm-links > li.active > a { color: var(--text); background: rgba(255,255,255,.06); }
+
+    /* ── Dropdown ──────────────────────────────────────── */
+    .rcm-drop { position: relative; }
+    .rcm-drop > a::after { content: ' ▾'; font-size: 10px; opacity: .6; }
+
+    .rcm-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 0;
+      list-style: none;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      z-index: 10000;
+    }
+    .rcm-dropdown li a {
+      display: block;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+    }
+    .rcm-dropdown li a:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .rcm-drop:hover .rcm-dropdown { display: block; }
+
+    /* ── Actions ───────────────────────────────────────── */
+    .rcm-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .rcm-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .rcm-btn-ghost {
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+    }
+    .rcm-btn-ghost:hover { background: rgba(255,255,255,.13); }
+    .rcm-btn-primary {
+      background: var(--gold);
+      color: #0a0a0a;
+    }
+    .rcm-btn-primary:hover { background: #ffd560; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(240,192,64,.28); }
+
+    /* ── Burger ────────────────────────────────────────── */
+    .rcm-burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+    .rcm-burger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform .3s, opacity .3s, width .3s;
+    }
+    /* X animation */
+    .rcm-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .rcm-burger.open span:nth-child(2) { opacity: 0; width: 0; }
+    .rcm-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile drawer ─────────────────────────────────── */
+    .rcm-mobile {
+      display: none;
+      position: fixed;
+      inset: var(--nav-h) 0 0 0;
+      background: var(--bg);
+      z-index: 9998;
+      overflow-y: auto;
+      padding: 20px 20px 32px;
+      flex-direction: column;
+      gap: 0;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    .rcm-mobile.open {
+      display: flex;
+      transform: translateX(0);
+    }
+
+    /* accordion sections */
+    .rcm-mob-section { border-bottom: 1px solid var(--border); }
+    .rcm-mob-section summary {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+    .rcm-mob-section summary::-webkit-details-marker { display: none; }
+    .rcm-mob-section summary .chevron {
+      font-size: 12px;
+      opacity: .5;
+      transition: transform .25s;
+    }
+    .rcm-mob-section[open] summary .chevron { transform: rotate(180deg); }
+    .rcm-mob-section ul { list-style: none; padding: 4px 0 12px; margin: 0; }
+    .rcm-mob-section ul li a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .rcm-mob-section ul li a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+
+    .rcm-mob-plain {
+      display: block;
+      padding: 16px 0;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .rcm-mob-plain:hover { color: var(--gold); }
+
+    .rcm-mob-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .rcm-mob-actions .rcm-btn { justify-content: center; }
+
+    /* ── Responsive breakpoints ────────────────────────── */
+    @media (max-width: 960px) {
+      .rcm-links, .rcm-actions { display: none; }
+      .rcm-burger { display: flex; }
+    }
+    @media (max-width: 480px) {
+      .rcm-logo { font-size: 16px; }
+    }
+
+  </style>
+
+
+</head>
+<body>
+
+<!-- ═══ RCM Unified Nav ════════════════════════════════════ -->
+<header class="rcm-header" id="rcmHeader">
+  <nav class="rcm-nav">
+    <a href="index.html" class="rcm-logo">Retro Clurix <span>Miners</span></a>
+
+    <ul class="rcm-links">
+      <li class="rcm-drop">
+        <a href="#">Products</a>
+        <ul class="rcm-dropdown">
+          <li><a href="platform-1.html">Margin Trading</a></li>
+          <li><a href="covesting-1.html">Copy-Trading</a></li>
+          <li><a href="buy-crypto.html">Buy Crypto</a></li>
+          <li><a href="contests.html">Trading Contests</a></li>
+          <li><a href="trading-academy.html">Academy</a></li>
+        </ul>
+      </li>
+      <li class="rcm-drop">
+        <a href="#">Markets</a>
+        <ul class="rcm-dropdown">
+          <li><a href="cryptocurrency-margin-trading-1.html">Cryptocurrencies</a></li>
+          <li><a href="forex-trading-1.html">Forex</a></li>
+          <li><a href="commodities-trading-1.html">Commodities</a></li>
+          <li><a href="gold-trading-1.html">Gold Trading</a></li>
+          <li><a href="index-trading-1.html">Stock Indices</a></li>
+          <li><a href="leverage-trading-crypto-indices-forex-1.html">All Instruments</a></li>
+        </ul>
+      </li>
+      <li class="rcm-drop">
+        <a href="#">Company</a>
+        <ul class="rcm-dropdown">
+          <li><a href="about-1.html">About Us</a></li>
+          <li><a href="security-1.html">Security</a></li>
+          <li><a href="fees-1.html">Fees</a></li>
+          <li><a href="press-and-media-1.html">Press &amp; Media</a></li>
+          <li><a href="index-5.html">Help Center</a></li>
+        </ul>
+      </li>
+      <li><a href="platform.html">Platform</a></li>
+      <li><a href="ambassador-1.html">Refer &amp; Earn</a></li>
+    </ul>
+
+    <div class="rcm-actions">
+      <a href="signin.html" class="rcm-btn rcm-btn-ghost">Login</a>
+      <a href="register.html" class="rcm-btn rcm-btn-primary">Register</a>
+    </div>
+
+    <button class="rcm-burger" id="rcmBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- ═══ Mobile Drawer ═══════════════════════════════════════ -->
+<div class="rcm-mobile" id="rcmMobile" role="dialog" aria-label="Navigation menu">
+  <details class="rcm-mob-section">
+    <summary>Products <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="platform-1.html">Margin Trading</a></li>
+      <li><a href="covesting-1.html">Copy-Trading</a></li>
+      <li><a href="buy-crypto.html">Buy Crypto</a></li>
+      <li><a href="contests.html">Trading Contests</a></li>
+      <li><a href="trading-academy.html">Academy</a></li>
+    </ul>
+  </details>
+  <details class="rcm-mob-section">
+    <summary>Markets <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="cryptocurrency-margin-trading-1.html">Cryptocurrencies</a></li>
+      <li><a href="forex-trading-1.html">Forex</a></li>
+      <li><a href="commodities-trading-1.html">Commodities</a></li>
+      <li><a href="gold-trading-1.html">Gold Trading</a></li>
+      <li><a href="index-trading-1.html">Stock Indices</a></li>
+      <li><a href="leverage-trading-crypto-indices-forex-1.html">All Instruments</a></li>
+    </ul>
+  </details>
+  <details class="rcm-mob-section">
+    <summary>Company <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="about-1.html">About Us</a></li>
+      <li><a href="security-1.html">Security</a></li>
+      <li><a href="fees-1.html">Fees</a></li>
+      <li><a href="press-and-media-1.html">Press &amp; Media</a></li>
+      <li><a href="index-5.html">Help Center</a></li>
+    </ul>
+  </details>
+  <a href="platform.html" class="rcm-mob-plain">Platform</a>
+  <a href="ambassador-1.html" class="rcm-mob-plain">Refer &amp; Earn</a>
+  <div class="rcm-mob-actions">
+    <a href="signin.html" class="rcm-btn rcm-btn-ghost">Login</a>
+    <a href="register.html" class="rcm-btn rcm-btn-primary">Register</a>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════════════════════ -->
+
+
+
+</div>
+
+
+<div class="page-hero pt-nav">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-hero-content">
+      <div class="hero-tag">Pricing</div>
+      <h1 class="section-title" style="font-size:clamp(36px,6vw,68px);letter-spacing:-2px">Simple, transparent<br>fees. No surprises.</h1>
+      <p class="section-sub">We believe in complete fee transparency. See exactly what you pay — before you trade.</p>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <div class="grid-3" style="margin-bottom:64px">
+      <div class="card" style="text-align:center"><div style="font-family:var(--font-head);font-size:38px;font-weight:800;color:var(--gold)">0.05%</div><div style="font-family:var(--font-head);font-size:16px;font-weight:700;margin:8px 0 4px">Trading Fee</div><div style="color:var(--text2);font-size:13px">Per order, per side</div></div><div class="card" style="text-align:center"><div style="font-family:var(--font-head);font-size:38px;font-weight:800;color:var(--gold)">$0</div><div style="font-family:var(--font-head);font-size:16px;font-weight:700;margin:8px 0 4px">Deposit Fee</div><div style="color:var(--text2);font-size:13px">All methods, always free</div></div><div class="card" style="text-align:center"><div style="font-family:var(--font-head);font-size:38px;font-weight:800;color:var(--gold)">$0</div><div style="font-family:var(--font-head);font-size:16px;font-weight:700;margin:8px 0 4px">Account Fee</div><div style="color:var(--text2);font-size:13px">No monthly charges</div></div>
+    </div>
+
+    <p class="section-tag">Trading Fees</p>
+    <h2 class="section-title">Fee Schedule</h2>
+    <div class="card" style="margin-top:28px;padding:0">
+      <table class="styled-table">
+        <thead><tr><th>Asset Class</th><th>Maker Fee</th><th>Taker Fee</th><th>Overnight Fee</th><th>Min Trade</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cryptocurrencies</strong></td><td style='color:var(--green);font-family:var(--font-mono)'>0.01%</td><td style='font-family:var(--font-mono)'>0.05%</td><td style='color:var(--text2);font-family:var(--font-mono)'>0.05% / day</td><td style='font-family:var(--font-mono)'>$10</td></tr><tr><td><strong>Forex</strong></td><td style='color:var(--green);font-family:var(--font-mono)'>0.00%</td><td style='font-family:var(--font-mono)'>0.03%</td><td style='color:var(--text2);font-family:var(--font-mono)'>0.01% / day</td><td style='font-family:var(--font-mono)'>$10</td></tr><tr><td><strong>Commodities</strong></td><td style='color:var(--green);font-family:var(--font-mono)'>0.00%</td><td style='font-family:var(--font-mono)'>0.05%</td><td style='color:var(--text2);font-family:var(--font-mono)'>0.03% / day</td><td style='font-family:var(--font-mono)'>$10</td></tr><tr><td><strong>Stock Indices</strong></td><td style='color:var(--green);font-family:var(--font-mono)'>0.00%</td><td style='font-family:var(--font-mono)'>0.05%</td><td style='color:var(--text2);font-family:var(--font-mono)'>0.02% / day</td><td style='font-family:var(--font-mono)'>$10</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="section-tag" style="margin-top:56px">Deposits & Withdrawals</p>
+    <h2 class="section-title">Funding Fees</h2>
+    <div class="card" style="margin-top:28px;padding:0">
+      <table class="styled-table">
+        <thead><tr><th>Method</th><th>Deposit Fee</th><th>Withdrawal Fee</th><th>Processing Time</th><th>Min Amount</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Bitcoin (BTC)</strong></td><td style='color:var(--green)'>Free</td><td style='font-family:var(--font-mono)'>Network fee</td><td style='color:var(--text2)'>10–60 min</td><td style='font-family:var(--font-mono)'>$50</td></tr><tr><td><strong>Ethereum (ETH)</strong></td><td style='color:var(--green)'>Free</td><td style='font-family:var(--font-mono)'>Network fee</td><td style='color:var(--text2)'>5–30 min</td><td style='font-family:var(--font-mono)'>$50</td></tr><tr><td><strong>USDT (TRC20)</strong></td><td style='color:var(--green)'>Free</td><td style='font-family:var(--font-mono)'>1 USDT</td><td style='color:var(--text2)'>1–10 min</td><td style='font-family:var(--font-mono)'>$50</td></tr><tr><td><strong>Credit/Debit Card</strong></td><td style='color:var(--green)'>Free</td><td style='font-family:var(--font-mono)'>2.5%</td><td style='color:var(--text2)'>Instant</td><td style='font-family:var(--font-mono)'>$50</td></tr><tr><td><strong>Bank Wire</strong></td><td style='color:var(--green)'>Free</td><td style='font-family:var(--font-mono)'>$25 flat</td><td style='color:var(--text2)'>1–3 days</td><td style='font-family:var(--font-mono)'>$100</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-3" style="margin-top:56px">
+      <div class="card"><div class="feat-icon">💡</div><h3 style="font-family:var(--font-head);font-size:16px;font-weight:700;margin-bottom:8px">Leverage up to 100×</h3><p style="color:var(--text2);font-size:13px">Trade crypto with up to 100× leverage, forex up to 1000×.</p></div><div class="card"><div class="feat-icon">⚡</div><h3 style="font-family:var(--font-head);font-size:16px;font-weight:700;margin-bottom:8px">Instant Execution</h3><p style="color:var(--text2);font-size:13px">Orders filled in under 10ms. No slippage on standard trades.</p></div><div class="card"><div class="feat-icon">🔄</div><h3 style="font-family:var(--font-head);font-size:16px;font-weight:700;margin-bottom:8px">No Inactivity Fee</h3><p style="color:var(--text2);font-size:13px">We never charge you for not trading.</p></div>
+    </div>
+  </div>
+</section>
+<section><div class="container"><div class="cta-strip">
+  <h2>Start trading with low fees today</h2>
+  <p>Open your free account and keep more of your profits.</p>
+  <div class="cta-btns">
+    <a href="dash/dashboard/auth/register.html" class="btn btn-primary">Open Free Account</a>
+  </div>
+</div></div></section>
+
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo">Retro Clurix <span>Miners</span></a>
+        <p>An award-winning cryptocurrency trading platform for global markets.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn" title="Telegram">✈️</a>
+          <a href="#" class="social-btn" title="Twitter">🐦</a>
+          <a href="#" class="social-btn" title="Facebook">📘</a>
+          <a href="#" class="social-btn" title="Instagram">📸</a>
+          <a href="#" class="social-btn" title="YouTube">▶️</a>
+          <a href="#" class="social-btn" title="Discord">💬</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Products</h4><ul>
+        <li><a href="platform-1.html">Margin Trading</a></li>
+        <li><a href="covesting-1.html">Copy-trading</a></li>
+        <li><a href="buy-crypto.html">Buy Crypto</a></li>
+        <li><a href="contests-1.html">Contests</a></li>
+        <li><a href="trading-academy.html">Academy</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Markets</h4><ul>
+        <li><a href="cryptocurrency-margin-trading-1.html">Crypto</a></li>
+        <li><a href="forex-trading-1.html">Forex</a></li>
+        <li><a href="commodities-trading-1.html">Commodities</a></li>
+        <li><a href="index-trading-1.html">Indices</a></li>
+        <li><a href="gold-trading-1.html">Gold</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Company</h4><ul>
+        <li><a href="about-1.html">About Us</a></li>
+        <li><a href="security-1.html">Security</a></li>
+        <li><a href="fees-1.html">Fees</a></li>
+        <li><a href="press-and-media-1.html">Press</a></li>
+        <li><a href="ambassador-1.html">Refer &amp; Earn</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Support</h4><ul>
+        <li><a href="index-5.html">Help Center</a></li>
+        <li><a href="dash/dashboard/auth/register.html">Open Account</a></li>
+        <li><a href="dash/dashboard/auth/signin.html">Login</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p><strong>Risk Warning:</strong> Trading with margin carries a high level of risk. All investments involve risk and losses may exceed the principal invested. You are solely responsible for evaluating risks. Retro Clurix Miners Trading Services LLC, St. Vincent and the Grenadines.</p>
+      <span class="footer-copyright">&copy; 2024 Retro Clurix Miners. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+<script>
+document.getElementById('burger').addEventListener('click',()=>document.getElementById('mobileMenu').classList.toggle('open'));
+</script>
+
+
+<script>
+(function(){
+  /* ── Burger toggle ── */
+  var burger = document.getElementById('rcmBurger');
+  var mobile = document.getElementById('rcmMobile');
+  var header = document.getElementById('rcmHeader');
+  if(burger && mobile){
+    burger.addEventListener('click', function(){
+      var open = mobile.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    // Close on outside click
+    document.addEventListener('click', function(e){
+      if(mobile.classList.contains('open') && !mobile.contains(e.target) && !burger.contains(e.target)){
+        mobile.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+      }
+    });
+    // Close on nav link click
+    mobile.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        mobile.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+  /* ── Scroll shadow ── */
+  if(header){
+    window.addEventListener('scroll', function(){
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, {passive:true});
+  }
+  /* ── Active link highlight ── */
+  var page = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.rcm-links a, .rcm-mobile a').forEach(function(a){
+    if(a.getAttribute('href') === page) a.closest('li') && a.closest('li').classList.add('active');
+  });
+})();
+</script>
+
+</body>
+</html>

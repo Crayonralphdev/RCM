@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Panel | Retro Clurix Miners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#f0c040;--gold-glow:rgba(240,192,64,0.15);--green:#1fd98a;--red:#f05565;--blue:#3d9cf0;--radius:14px;--font-head:'Syne',sans-serif;--font-mono:'JetBrains Mono',monospace;--font-body:'DM Sans',sans-serif;--transition:0.3s cubic-bezier(.4,0,.2,1)}
+[data-theme="dark"]{--bg:#07090f;--bg2:#0e1220;--surface:#131827;--surface2:#1a2035;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#e2e6f0;--text2:#8892aa;--text3:#4a5468;--shadow:0 8px 32px rgba(0,0,0,0.5)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:inherit}input,select,textarea{font-family:inherit}
+
+/* ── Sidebar ── */
+.sidebar{width:230px;min-width:230px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;z-index:10;position:sticky;top:0}
+.sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:16px;font-weight:800;letter-spacing:-.5px}
+.sidebar-logo span{color:var(--red)}
+.sidebar-logo small{display:block;font-size:10px;font-weight:400;color:var(--text3);margin-top:2px;font-family:var(--font-body);letter-spacing:1.5px;text-transform:uppercase}
+.sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--text2);font-size:13px;font-weight:500;transition:background .15s,color .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(240,85,101,.12);color:var(--red);font-weight:600}
+.nav-item .icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.nav-item .nbadge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;min-width:20px;text-align:center}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:12px 12px 4px;font-weight:600}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
+.topbar-title{font-family:var(--font-head);font-size:16px;font-weight:700}
+.topbar-spacer{flex:1}
+.admin-pill{background:rgba(240,85,101,.1);color:var(--red);padding:4px 14px;border-radius:99px;font-size:11px;font-weight:700;border:1px solid rgba(240,85,101,.25);font-family:var(--font-head)}
+
+.content{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.panel{display:none;flex-direction:column;gap:18px}
+.panel.active{display:flex}
+
+/* ── Cards ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:border-color .15s}
+.card:hover{border-color:var(--border2)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px}
+.card-title{font-family:var(--font-head);font-size:14px;font-weight:700}
+.badge{font-size:11px;padding:3px 9px;border-radius:99px;font-weight:600;white-space:nowrap}
+.b-green{background:rgba(31,217,138,.12);color:var(--green)}
+.b-gold{background:var(--gold-glow);color:var(--gold)}
+.b-red{background:rgba(240,85,101,.12);color:var(--red)}
+.b-blue{background:rgba(61,156,240,.12);color:var(--blue)}
+
+/* ── Stats grid ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:600;margin-bottom:8px}
+.stat-value{font-family:var(--font-mono);font-size:22px;font-weight:600;line-height:1}
+.stat-sub{margin-top:5px;font-size:12px;color:var(--text2)}
+
+/* ── Two col ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ── Table ── */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{text-align:left;padding:8px 12px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);border-bottom:1px solid var(--border);font-weight:600}
+.data-table td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--surface2)}
+.mono{font-family:var(--font-mono);font-size:12px}
+
+/* ── Forms ── */
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:600;margin-bottom:6px}
+.form-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--font-mono);font-size:13px;outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--gold)}
+.form-select{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;outline:none;appearance:none}
+textarea.form-input{resize:vertical;min-height:80px;font-family:var(--font-body);line-height:1.6}
+
+/* ── Buttons ── */
+.btn{padding:9px 18px;border-radius:8px;border:none;font-family:var(--font-head);font-size:12px;font-weight:700;transition:all .15s;cursor:pointer}
+.btn:hover{opacity:.85;transform:translateY(-1px)}
+.btn-green{background:var(--green);color:#000}
+.btn-red{background:var(--red);color:#fff}
+.btn-gold{background:var(--gold);color:#000}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-ghost{background:transparent;border:1.5px solid var(--border2);color:var(--text2)}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:6px}
+
+/* ── Notification items ── */
+.notif-item{background:var(--surface2);border-radius:10px;padding:14px 16px;border-left:3px solid var(--blue);position:relative}
+.notif-item.unread{border-left-color:var(--gold)}
+.notif-item.n-deposit{border-left-color:var(--green)}
+.notif-item.n-payment_intent{border-left-color:var(--gold)}
+.notif-item.n-withdraw{border-left-color:var(--red)}
+.notif-item.n-support_message{border-left-color:var(--blue)}
+
+/* ── Chip status ── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
+.c-green{background:rgba(31,217,138,.12);color:var(--green)}
+.c-red{background:rgba(240,85,101,.12);color:var(--red)}
+.c-gold{background:var(--gold-glow);color:var(--gold)}
+.c-blue{background:rgba(61,156,240,.12);color:var(--blue)}
+
+/* ── User avatar ── */
+.uav{width:30px;height:30px;border-radius:50%;background:var(--gold-glow);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);font-family:var(--font-head);flex-shrink:0}
+
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:var(--font-head);font-size:18px;font-weight:800;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text3);margin-bottom:20px}
+
+/* ── Toast ── */
+.toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:999}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;box-shadow:var(--shadow);animation:slIn .3s ease,fdOut .4s 2.6s ease forwards;display:flex;align-items:center;gap:10px;max-width:360px}
+.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}.toast.info{border-left:3px solid var(--gold)}
+@keyframes slIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fdOut{from{opacity:1}to{opacity:0;pointer-events:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.6s infinite;margin-right:4px}
+
+/* ── Balance op buttons ── */
+.op-btn{padding:9px;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-weight:700;font-size:11px;cursor:pointer;transition:all .15s;font-family:var(--font-head)}
+.op-btn.active{border-color:var(--gold);background:var(--gold-glow);color:var(--gold)}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* ── Loading skeleton ── */
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:16px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+@media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}}
+</style>
+  <style>
+
+    /* ═══════════════════════════════════════════════════════
+       RCM  —  Unified Navigation  (injected)
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      --nav-h: 68px;
+      --bg:        #050a18;
+      --surface:   #0c1428;
+      --border:    rgba(255,255,255,0.08);
+      --gold:      #f0c040;
+      --gold-dim:  #c89e20;
+      --text:      #e8eaf0;
+      --muted:     #7b8299;
+      --green:     #22d98a;
+      --red:       #f05a5a;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius:    12px;
+    }
+
+    /* ── Google Fonts  ──────────────────────────────────── */
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+    /* ── Base header  ──────────────────────────────────── */
+    header.rcm-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      height: var(--nav-h);
+      background: rgba(5,10,24,0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      transition: background .3s;
+    }
+    header.rcm-header.scrolled { background: rgba(5,10,24,0.98); }
+
+    .rcm-nav {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    /* ── Logo ──────────────────────────────────────────── */
+    .rcm-logo {
+      font-family: var(--font-head);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .rcm-logo span { color: var(--gold); }
+
+    /* ── Desktop links ─────────────────────────────────── */
+    .rcm-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+    .rcm-links > li > a {
+      display: block;
+      padding: 8px 13px;
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+      white-space: nowrap;
+    }
+    .rcm-links > li > a:hover,
+    .rcm-links > li.active > a { color: var(--text); background: rgba(255,255,255,.06); }
+
+    /* ── Dropdown ──────────────────────────────────────── */
+    .rcm-drop { position: relative; }
+    .rcm-drop > a::after { content: ' ▾'; font-size: 10px; opacity: .6; }
+
+    .rcm-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 0;
+      list-style: none;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      z-index: 10000;
+    }
+    .rcm-dropdown li a {
+      display: block;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+    }
+    .rcm-dropdown li a:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .rcm-drop:hover .rcm-dropdown { display: block; }
+
+    /* ── Actions ───────────────────────────────────────── */
+    .rcm-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .rcm-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .rcm-btn-ghost {
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+    }
+    .rcm-btn-ghost:hover { background: rgba(255,255,255,.13); }
+    .rcm-btn-primary {
+      background: var(--gold);
+      color: #0a0a0a;
+    }
+    .rcm-btn-primary:hover { background: #ffd560; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(240,192,64,.28); }
+
+    /* ── Burger ────────────────────────────────────────── */
+    .rcm-burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+    .rcm-burger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform .3s, opacity .3s, width .3s;
+    }
+    /* X animation */
+    .rcm-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .rcm-burger.open span:nth-child(2) { opacity: 0; width: 0; }
+    .rcm-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile drawer ─────────────────────────────────── */
+    .rcm-mobile {
+      display: none;
+      position: fixed;
+      inset: var(--nav-h) 0 0 0;
+      background: var(--bg);
+      z-index: 9998;
+      overflow-y: auto;
+      padding: 20px 20px 32px;
+      flex-direction: column;
+      gap: 0;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    .rcm-mobile.open {
+      display: flex;
+      transform: translateX(0);
+    }
+
+    /* accordion sections */
+    .rcm-mob-section { border-bottom: 1px solid var(--border); }
+    .rcm-mob-section summary {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+    .rcm-mob-section summary::-webkit-details-marker { display: none; }
+    .rcm-mob-section summary .chevron {
+      font-size: 12px;
+      opacity: .5;
+      transition: transform .25s;
+    }
+    .rcm-mob-section[open] summary .chevron { transform: rotate(180deg); }
+    .rcm-mob-section ul { list-style: none; padding: 4px 0 12px; margin: 0; }
+    .rcm-mob-section ul li a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .rcm-mob-section ul li a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+
+    .rcm-mob-plain {
+      display: block;
+      padding: 16px 0;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .rcm-mob-plain:hover { color: var(--gold); }
+
+    .rcm-mob-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .rcm-mob-actions .rcm-btn { justify-content: center; }
+
+    /* ── Responsive breakpoints ────────────────────────── */
+    @media (max-width: 960px) {
+      .rcm-links, .rcm-actions { display: none; }
+      .rcm-burger { display: flex; }
+    }
+    @media (max-width: 480px) {
+      .rcm-logo { font-size: 16px; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Admin Login Overlay -->
+<div id="adminLoginOverlay" style="display:none;position:fixed;inset:0;background:rgba(7,9,15,0.97);z-index:9999;align-items:center;justify-content:center;flex-direction:column">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center">
+    <div style="font-size:28px;margin-bottom:8px">🔐</div>
+    <h2 style="color:var(--gold);font-size:20px;margin:0 0 4px">Admin Panel</h2>
+    <p style="color:var(--text3);font-size:13px;margin:0 0 24px">Retro Clurix Miners</p>
+    <div style="margin-bottom:14px;text-align:left">
+      <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">EMAIL</label>
+      <input id="adminEmailInput" type="email" value="admin@retroclurixminers.net" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:14px;box-sizing:border-box" placeholder="Admin email">
+    </div>
+    <div style="margin-bottom:14px;text-align:left">
+      <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">PASSWORD</label>
+      <input id="adminPassInput" type="password" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:14px;box-sizing:border-box" placeholder="Admin password" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <div id="adminLoginErr" style="display:none;color:#f05565;font-size:13px;margin-bottom:12px"></div>
+    <button onclick="doAdminLogin()" style="width:100%;padding:12px;background:var(--gold);color:#0a0a0a;font-weight:800;font-size:15px;border:none;border-radius:8px;cursor:pointer">Sign In to Admin</button>
+  </div>
+</div>
+
+
+<!-- ═══ RCM Unified Nav ════════════════════════════════════ -->
+<header class="rcm-header" id="rcmHeader">
+  <nav class="rcm-nav">
+    <a href="index.html" class="rcm-logo">Retro Clurix <span>Miners</span></a>
+
+    <ul class="rcm-links">
+      <li class="rcm-drop">
+        <a href="#">Products</a>
+        <ul class="rcm-dropdown">
+          <li><a href="platform-1.html">Margin Trading</a></li>
+          <li><a href="covesting-1.html">Copy-Trading</a></li>
+          <li><a href="buy-crypto.html">Buy Crypto</a></li>
+          <li><a href="contests.html">Trading Contests</a></li>
+          <li><a href="trading-academy.html">Academy</a></li>
+        </ul>
+      </li>
+      <li class="rcm-drop">
+        <a href="#">Markets</a>
+        <ul class="rcm-dropdown">
+          <li><a href="cryptocurrency-margin-trading-1.html">Cryptocurrencies</a></li>
+          <li><a href="forex-trading-1.html">Forex</a></li>
+          <li><a href="commodities-trading-1.html">Commodities</a></li>
+          <li><a href="gold-trading-1.html">Gold Trading</a></li>
+          <li><a href="index-trading-1.html">Stock Indices</a></li>
+          <li><a href="leverage-trading-crypto-indices-forex-1.html">All Instruments</a></li>
+        </ul>
+      </li>
+      <li class="rcm-drop">
+        <a href="#">Company</a>
+        <ul class="rcm-dropdown">
+          <li><a href="about-1.html">About Us</a></li>
+          <li><a href="security-1.html">Security</a></li>
+          <li><a href="fees-1.html">Fees</a></li>
+          <li><a href="press-and-media-1.html">Press &amp; Media</a></li>
+          <li><a href="index-5.html">Help Center</a></li>
+        </ul>
+      </li>
+      <li><a href="platform.html">Platform</a></li>
+      <li><a href="ambassador-1.html">Refer &amp; Earn</a></li>
+    </ul>
+
+    <div class="rcm-actions">
+      <a href="#" onclick="adminLogout();return false;" class="rcm-btn rcm-btn-ghost">Logout</a>
+      <a href="register.html" class="rcm-btn rcm-btn-primary">Register</a>
+    </div>
+
+    <button class="rcm-burger" id="rcmBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- ═══ Mobile Drawer ═══════════════════════════════════════ -->
+<div class="rcm-mobile" id="rcmMobile" role="dialog" aria-label="Navigation menu">
+  <details class="rcm-mob-section">
+    <summary>Products <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="platform-1.html">Margin Trading</a></li>
+      <li><a href="covesting-1.html">Copy-Trading</a></li>
+      <li><a href="buy-crypto.html">Buy Crypto</a></li>
+      <li><a href="contests.html">Trading Contests</a></li>
+      <li><a href="trading-academy.html">Academy</a></li>
+    </ul>
+  </details>
+  <details class="rcm-mob-section">
+    <summary>Markets <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="cryptocurrency-margin-trading-1.html">Cryptocurrencies</a></li>
+      <li><a href="forex-trading-1.html">Forex</a></li>
+      <li><a href="commodities-trading-1.html">Commodities</a></li>
+      <li><a href="gold-trading-1.html">Gold Trading</a></li>
+      <li><a href="index-trading-1.html">Stock Indices</a></li>
+      <li><a href="leverage-trading-crypto-indices-forex-1.html">All Instruments</a></li>
+    </ul>
+  </details>
+  <details class="rcm-mob-section">
+    <summary>Company <span class="chevron">▾</span></summary>
+    <ul>
+      <li><a href="about-1.html">About Us</a></li>
+      <li><a href="security-1.html">Security</a></li>
+      <li><a href="fees-1.html">Fees</a></li>
+      <li><a href="press-and-media-1.html">Press &amp; Media</a></li>
+      <li><a href="index-5.html">Help Center</a></li>
+    </ul>
+  </details>
+  <a href="platform.html" class="rcm-mob-plain">Platform</a>
+  <a href="ambassador-1.html" class="rcm-mob-plain">Refer &amp; Earn</a>
+  <div class="rcm-mob-actions">
+    <a href="#" onclick="adminLogout();return false;" class="rcm-btn rcm-btn-ghost">Logout</a>
+    <a href="register.html" class="rcm-btn rcm-btn-primary">Register</a>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════════════════════ -->
+
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">RCM <span>Admin</span><small>Control Panel</small></div>
+  <nav class="sidebar-nav">
+    <span class="nav-section">Dashboard</span>
+    <button class="nav-item active" onclick="showPanel('overview',this)"><span class="icon">📊</span><span>Overview</span></button>
+    <button class="nav-item" onclick="showPanel('notifications',this)" id="navNotif"><span class="icon">🔔</span><span>Notifications</span><span class="nbadge" id="notifBadge" style="display:none">0</span></button>
+    <span class="nav-section">Users</span>
+    <button class="nav-item" onclick="showPanel('users',this)"><span class="icon">👥</span><span>All Users</span></button>
+    <button class="nav-item" onclick="showPanel('balances',this)"><span class="icon">💰</span><span>Set Balances</span></button>
+    <span class="nav-section">Finance</span>
+    <button class="nav-item" onclick="showPanel('deposits',this)"><span class="icon">📥</span><span>Deposits</span><span class="nbadge" id="depBadge" style="display:none">0</span></button>
+    <button class="nav-item" onclick="showPanel('withdrawals',this)"><span class="icon">📤</span><span>Withdrawals</span><span class="nbadge" id="wdBadge" style="display:none">0</span></button>
+    <button class="nav-item" onclick="showPanel('messages',this)"><span class="icon">💬</span><span>Messages</span><span class="nbadge" id="msgBadge" style="display:none">0</span></button>
+  </nav>
+  <div style="padding:12px 10px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--surface2)">
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(240,85,101,.1);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--red);font-family:var(--font-head)">AD</div>
+      <div><strong style="display:block;font-size:12px;font-weight:600">Admin</strong><small style="color:var(--text2);font-size:10px">craralph@gmail.com</small></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Overview</div>
+    <div class="topbar-spacer"></div>
+    <span class="admin-pill">🔐 Admin</span>
+    <button onclick="showPanel('notifications',document.getElementById('navNotif'))" style="position:relative;width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:16px;display:flex;align-items:center;justify-content:center">
+      🔔<span id="topNotifDot" style="display:none;position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--surface)"></span>
+    </button>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="s-users">—</div><div class="stat-sub" id="s-active">Active accounts</div></div>
+        <div class="stat-card"><div class="stat-label">Total Deposited</div><div class="stat-value" id="s-deposited" style="color:var(--green)">—</div><div class="stat-sub">Completed deposits</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Actions</div><div class="stat-value" id="s-pending" style="color:var(--gold)">—</div><div class="stat-sub" id="s-pending-sub">Deposits + withdrawals</div></div>
+        <div class="stat-card"><div class="stat-label">Unread Messages</div><div class="stat-value" id="s-msgs" style="color:var(--blue)">—</div><div class="stat-sub">From users</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recent Activity</span><span class="badge b-gold"><span class="live-dot"></span>Live</span></div>
+          <div id="overviewActivity" style="display:flex;flex-direction:column;gap:8px">
+            <div class="skeleton" style="height:50px"></div>
+            <div class="skeleton" style="height:50px"></div>
+            <div class="skeleton" style="height:50px"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recent Users</span><button class="btn btn-ghost" style="padding:5px 12px;font-size:11px" onclick="showPanel('users',document.querySelector('[onclick*=users]'))">View all →</button></div>
+          <div id="overviewUsers"><div class="skeleton" style="height:150px"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="panel" id="panel-notifications">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔔 Notifications</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="markAllRead()" style="padding:6px 12px;font-size:11px">Mark all read</button>
+            <button class="btn btn-ghost" onclick="refreshNotifications()" style="padding:6px 12px;font-size:11px">↻ Refresh</button>
+          </div>
+        </div>
+        <div id="notifList" style="display:flex;flex-direction:column;gap:10px">
+          <div style="color:var(--text3);text-align:center;padding:30px">Loading notifications…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="panel" id="panel-users">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">👥 User Management</span>
+          <button class="btn btn-gold" onclick="openAddUser()" style="padding:7px 16px;font-size:11px">+ Add User</button>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <input type="text" class="form-input" id="userSearch" placeholder="🔍 Search name, email, UUID…" oninput="loadUsers()" style="max-width:320px;flex:1">
+          <select class="form-select" id="userStatusFilter" onchange="loadUsers()" style="width:160px">
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+            <option value="banned">Banned</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr><th>User</th><th>Email</th><th>Country</th><th>USD Balance</th><th>KYC</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="usersBody"><tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">Loading users…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SET BALANCES -->
+    <div class="panel" id="panel-balances">
+      <div class="two-col" style="align-items:start">
+        <div class="card">
+          <div class="card-header"><span class="card-title">💰 Set User Balance</span></div>
+          <div class="form-group">
+            <label class="form-label">Select User</label>
+            <select class="form-select" id="balUserSel"><option value="">Loading users…</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Currency</label>
+            <select class="form-select" id="balCurrency">
+              <option value="USD">USD — US Dollar</option>
+              <option value="BTC">BTC — Bitcoin</option>
+              <option value="ETH">ETH — Ethereum</option>
+              <option value="USDT">USDT — Tether</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount</label>
+            <input type="number" class="form-input" id="balAmount" placeholder="0.00" min="0" style="font-size:20px;padding:14px 16px">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Operation</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <button class="op-btn active" id="opSet"      onclick="setOp('set')">Set to Amount</button>
+              <button class="op-btn"        id="opAdd"      onclick="setOp('add')">+ Add</button>
+              <button class="op-btn"        id="opSubtract" onclick="setOp('subtract')">− Subtract</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Admin Note (optional)</label>
+            <input type="text" class="form-input" id="balNote" placeholder="e.g. Bonus credit, KYC reward…">
+          </div>
+          <button class="btn btn-green" style="width:100%;padding:13px;font-size:14px" onclick="applyBalance()">✓ Apply Balance Change</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Change Log</span><button class="btn btn-ghost" style="padding:5px 12px;font-size:11px" onclick="clearBalanceLog()">Clear</button></div>
+          <div id="balanceLog" style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+            <div style="color:var(--text3);text-align:center;padding:20px">No changes yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEPOSITS -->
+    <div class="panel" id="panel-deposits">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📥 Deposit Requests</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="badge b-gold" id="depCount">0 pending</span>
+            <button class="btn btn-ghost" onclick="loadDeposits()" style="padding:5px 12px;font-size:11px">↻ Refresh</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="depositsBody"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- WITHDRAWALS -->
+    <div class="panel" id="panel-withdrawals">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📤 Withdrawal Requests</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="badge b-red" id="wdCount">0 pending</span>
+            <button class="btn btn-ghost" onclick="loadWithdrawals()" style="padding:5px 12px;font-size:11px">↻ Refresh</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr><th>User</th><th>Amount</th><th>Fee</th><th>Method</th><th>Address</th><th>Submitted</th><th>Actions</th></tr></thead>
+            <tbody id="withdrawalsBody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3)">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="panel" id="panel-messages">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💬 Support Messages</span>
+          <button class="btn btn-ghost" onclick="loadMessages()" style="padding:5px 12px;font-size:11px">↻ Refresh</button>
+        </div>
+        <div id="messagesList" style="display:flex;flex-direction:column;gap:12px">
+          <div style="color:var(--text3);text-align:center;padding:30px">Loading messages…</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal-box">
+    <div class="modal-title" id="uModalTitle">Add New User</div>
+    <div class="modal-sub" id="uModalSub">Fill in the profile details below</div>
+    <input type="hidden" id="uId">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" id="uFn" placeholder="John"></div>
+      <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" id="uLn" placeholder="Doe"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="uEmail" placeholder="user@example.com"></div>
+    <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-input" id="uPhone" placeholder="+1 234 567 8900"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-label">Country</label>
+        <select class="form-select" id="uCountry">
+          <option>United States</option><option>United Kingdom</option><option>Nigeria</option><option>Germany</option><option>Australia</option><option>Canada</option><option>France</option><option>South Africa</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="uStatus"><option value="active">Active</option><option value="suspended">Suspended</option><option value="banned">Banned</option></select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-label">Role</label>
+        <select class="form-select" id="uRole"><option value="user">User</option><option value="support">Support</option><option value="admin">Admin</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">KYC Status</label>
+        <select class="form-select" id="uKyc"><option value="none">None</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select>
+      </div>
+    </div>
+    <div class="form-group" id="uPassGroup">
+      <label class="form-label">Password <span style="color:var(--text3);font-weight:400;text-transform:none">(leave blank to keep)</span></label>
+      <input type="password" class="form-input" id="uPass" placeholder="Min 8 chars, 1 uppercase, 1 number">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-green" style="flex:1;padding:12px" onclick="saveUser()">Save User</button>
+      <button onclick="closeModal('userModal')" style="flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--border2);background:none;color:var(--text2);font-weight:700;cursor:pointer">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- View User Profile Modal -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-box" style="max-width:540px">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+      <div id="pAvatar" style="width:52px;height:52px;border-radius:50%;background:var(--gold-glow);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-head);flex-shrink:0"></div>
+      <div><div id="pName" style="font-family:var(--font-head);font-size:20px;font-weight:800"></div><div id="pEmail" style="font-size:12px;color:var(--text3);margin-top:2px"></div></div>
+      <button onclick="closeModal('profileModal')" style="margin-left:auto;background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div id="pDetails" style="display:flex;flex-direction:column;gap:0;font-size:13px;margin-bottom:20px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-gold" style="flex:1;padding:11px" onclick="editFromProfile()">✏️ Edit</button>
+      <button class="btn btn-green" style="flex:1;padding:11px" onclick="setBalFromProfile()">💰 Set Balance</button>
+      <button onclick="closeModal('profileModal')" class="btn btn-ghost" style="padding:11px 18px">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   Config & State
+   ══════════════════════════════════════════════════════════ */
+const API_BASE = window.location.pathname.replace(/\/[^\/]*$/, '') + '/api';
+const IS_DEMO  = false;
+
+let currentOp         = 'set';
+let currentProfileId  = null;
+let allUsers          = [];
+
+/* ── Hardcoded admin login (no API needed) ───────────────── */
+const ADMIN_EMAIL    = 'admin@retroclurixminers.net';
+const ADMIN_PASSWORD = 'Demo1234!';
+
+function showAdminLogin() {
+  document.getElementById('adminLoginOverlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+}
+
+function hideAdminLogin() {
+  document.getElementById('adminLoginOverlay').style.display = 'none';
+}
+
+function doAdminLogin() {
+  const email = document.getElementById('adminEmailInput').value.trim();
+  const pass  = document.getElementById('adminPassInput').value;
+  const err   = document.getElementById('adminLoginErr');
+  if (email === ADMIN_EMAIL && pass === ADMIN_PASSWORD) {
+    localStorage.setItem('rcm_admin_authed', '1');
+    hideAdminLogin();
+    loadOverview();
+  } else {
+    err.textContent = 'Invalid email or password.';
+    err.style.display = 'block';
+    document.getElementById('adminPassInput').value = '';
+  }
+}
+
+function adminLogout() {
+  localStorage.removeItem('rcm_admin_authed');
+  localStorage.removeItem('rcm_token');
+  showAdminLogin();
+}
+
+/* ── Auth guard ────────────────────────────────────────── */
+(function() {
+  if (!localStorage.getItem('rcm_admin_authed')) {
+    // Show login overlay instead of redirecting
+    window.addEventListener('DOMContentLoaded', showAdminLogin);
+  }
+})();
+
+/* ── API helper — sends admin key so PHP always grants access ── */
+async function api(path, method = 'GET', body = null) {
+  const token = localStorage.getItem('rcm_token') || '';
+  const opts  = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Key': 'rcm-admin-2024'
+    }
+  };
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res  = await fetch(API_BASE + path, opts);
+    const data = await res.json();
+    return data;
+  } catch(e) {
+    console.error('Admin API error:', e);
+    return null;
+  }
+}
+
+/* ── Panel nav ──────────────────────────────────────── */
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  const titles = { overview:'Overview', notifications:'Notifications', users:'User Management', balances:'Set Balances', deposits:'Deposit Requests', withdrawals:'Withdrawal Requests', messages:'Support Messages' };
+  document.getElementById('topbarTitle').textContent = titles[id] || id;
+  if (id === 'overview')      loadOverview();
+  if (id === 'notifications') loadNotifications();
+  if (id === 'users')         loadUsers();
+  if (id === 'balances')      loadBalanceUserSelect();
+  if (id === 'deposits')      loadDeposits();
+  if (id === 'withdrawals')   loadWithdrawals();
+  if (id === 'messages')      loadMessages();
+}
+
+/* ══════════════════════════════════════════════════════════
+   Overview
+   ══════════════════════════════════════════════════════════ */
+async function loadOverview() {
+  // Stats
+  const stats = await api('/admin.php?action=stats');
+  if (stats?.success) {
+    document.getElementById('s-users').textContent      = stats.total_users;
+    document.getElementById('s-active').textContent     = stats.active_users + ' active';
+    document.getElementById('s-deposited').textContent  = '$' + Number(stats.total_deposited).toLocaleString();
+    document.getElementById('s-pending').textContent    = stats.pending_deposits + stats.pending_withdrawals;
+    document.getElementById('s-msgs').textContent       = stats.unread_messages;
+    updateBadges(stats.pending_deposits, stats.pending_withdrawals, stats.unread_messages);
+  } else {
+    // API failed — show zeros, not fake localStorage data
+    document.getElementById('s-users').textContent      = '—';
+    document.getElementById('s-active').textContent     = '—';
+    document.getElementById('s-deposited').textContent  = '—';
+    document.getElementById('s-pending').textContent    = '—';
+    document.getElementById('s-msgs').textContent       = '—';
+    console.warn('Admin stats API failed — are you logged in as admin?', stats);
+  }
+
+  // Activity feed
+  const notifData = await api('/admin.php?action=notifications&limit=8');
+  const actEl = document.getElementById('overviewActivity');
+  if (notifData?.success && notifData.notifications.length) {
+    actEl.innerHTML = notifData.notifications.slice(0,6).map(n => renderNotifCard(n)).join('');
+  } else {
+    actEl.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px">No activity yet — make sure you are logged in as admin</div>';
+  }
+
+  // Recent users
+  const usersData = await api('/admin.php?action=users');
+  const usersEl = document.getElementById('overviewUsers');
+  const users = usersData?.success ? usersData.users.slice(0, 5) : [];
+  if (!users.length) { usersEl.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px">No users yet</div>'; return; }
+  usersEl.innerHTML = `<table class="data-table"><thead><tr><th>Name</th><th>Balance</th><th>Status</th><th>Joined</th></tr></thead><tbody>
+    ${users.map(u => `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div class="uav">${(u.first_name||'?')[0]}${(u.last_name||'?')[0]}</div>
+        <div><strong>${u.first_name} ${u.last_name}</strong><div style="font-size:11px;color:var(--text3)">${u.email}</div></div>
+      </div></td>
+      <td class="mono" style="color:var(--gold)">$${Number(u.usd_balance||u.balance||0).toLocaleString()}</td>
+      <td>${statusChip(u.status||'active')}</td>
+      <td style="color:var(--text3);font-size:11px">${(u.created_at||u.joined||'').substring(0,10)}</td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Notifications
+   ══════════════════════════════════════════════════════════ */
+async function loadNotifications() {
+  const el = document.getElementById('notifList');
+  el.innerHTML = '<div style="color:var(--text3);text-align:center;padding:30px">Loading…</div>';
+  const d = await api('/admin.php?action=notifications');
+  if (d?.success && d.notifications.length) {
+    el.innerHTML = d.notifications.map(n => renderNotifCard(n)).join('');
+    updateBadge('notifBadge', d.notifications.length);
+  } else {
+    const local = getLocalNotifs();
+    el.innerHTML = local.length ? local.map(n => renderLocalNotif(n)).join('') : '<div style="color:var(--text3);text-align:center;padding:30px">No notifications yet</div>';
+    updateBadge('notifBadge', local.length);
+  }
+}
+
+function refreshNotifications() { loadNotifications(); showToast('Refreshed', 'info'); }
+
+function renderNotifCard(n) {
+  const typeMap = { deposit_submit:['📥','n-deposit','Deposit Submitted'], deposit_intent:['💳','n-payment_intent','Payment Intent'], withdrawal:['📤','n-withdraw','Withdrawal'], support_message:['💬','n-support_message','Support Message'], login:['🔑','','Login'], register:['👤','','Registration'] };
+  const [icon, cls, label] = typeMap[n.action] || ['🔔','','Activity'];
+  let detail = '';
+  try {
+    const det = typeof n.details === 'string' ? JSON.parse(n.details) : (n.details || {});
+    if (det.amount) detail = ` — <strong style="color:var(--green)">$${Number(det.amount).toLocaleString()}</strong>`;
+    if (det.subject) detail = ` — ${det.subject}`;
+  } catch(e) {}
+  return `<div class="notif-item ${cls}">
+    <div style="display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0">${icon}</span>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:13px;margin-bottom:2px">${n.first_name||''} ${n.last_name||''} <span style="font-weight:400;color:var(--text2)">— ${label}${detail}</span></div>
+        <div style="font-size:11px;color:var(--text3)">${n.email||''} · ${new Date(n.created_at).toLocaleString()}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderLocalNotif(n) {
+  const typeMap = { deposit:['📥','n-deposit','Deposit'], payment_intent:['💳','n-payment_intent','Payment Intent'], withdraw:['📤','n-withdraw','Withdrawal'], support_message:['💬','n-support_message','Message'] };
+  const [icon, cls, label] = typeMap[n.type] || ['🔔','','Activity'];
+  return `<div class="notif-item ${cls} ${n.read?'':'unread'}">
+    <div style="display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0">${icon}</span>
+      <div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:2px">${n.user||'User'} — ${label}${n.amount ? ` <strong style="color:var(--green)">$${Number(n.amount).toLocaleString()}</strong>` : ''}</div>
+        ${n.subject ? `<div style="font-size:12px;color:var(--text2)">Subject: ${n.subject}</div>` : ''}
+        ${n.body ? `<div style="font-size:12px;color:var(--text3);font-style:italic">"${String(n.body).substring(0,80)}${n.body.length>80?'…':''}"</div>` : ''}
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">${new Date(n.time).toLocaleString()}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function markAllRead() {
+  const notifs = getLocalNotifs().map(n => ({...n, read:true}));
+  localStorage.setItem('rcm_admin_notifications', JSON.stringify(notifs));
+  loadNotifications();
+  updateBadge('notifBadge', 0);
+  showToast('All marked as read', 'success');
+}
+
+/* ══════════════════════════════════════════════════════════
+   Users
+   ══════════════════════════════════════════════════════════ */
+async function loadUsers() {
+  const q      = document.getElementById('userSearch')?.value || '';
+  const status = document.getElementById('userStatusFilter')?.value || '';
+  const d      = await api(`/admin.php?action=users&q=${encodeURIComponent(q)}&status=${status}`);
+  allUsers = d?.success ? d.users : getLocalUsers();
+  if (q) allUsers = allUsers.filter(u => `${u.first_name} ${u.last_name} ${u.email}`.toLowerCase().includes(q.toLowerCase()));
+  renderUsersTable(allUsers);
+  loadBalanceUserSelect(allUsers);
+}
+
+function renderUsersTable(users) {
+  const body = document.getElementById('usersBody');
+  if (!users.length) { body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">No users found</td></tr>'; return; }
+  body.innerHTML = users.map(u => `<tr>
+    <td><div style="display:flex;align-items:center;gap:10px">
+      <div class="uav">${(u.first_name||'?')[0]}${(u.last_name||'?')[0]}</div>
+      <div><strong>${u.first_name} ${u.last_name}</strong><div style="font-size:11px;color:var(--text3)">${u.experience||''}</div></div>
+    </div></td>
+    <td style="color:var(--text2)">${u.email}</td>
+    <td>${u.country||'—'}</td>
+    <td class="mono" style="color:var(--gold);font-weight:700">$${Number(u.usd_balance||u.balance||0).toLocaleString()}</td>
+    <td>${kycChip(u.kyc_status||'none')}</td>
+    <td>${statusChip(u.status||'active')}</td>
+    <td style="color:var(--text3);font-size:11px">${(u.created_at||u.joined||'').substring(0,10)}</td>
+    <td>
+      <div style="display:flex;gap:5px">
+        <button onclick="viewProfile(${JSON.stringify(u).replace(/"/g,'&quot;')})" class="btn btn-ghost btn-sm">View</button>
+        <button onclick="openEditUser(${JSON.stringify(u).replace(/"/g,'&quot;')})" class="btn btn-sm" style="background:var(--gold-glow);border:1px solid rgba(240,192,64,.3);color:var(--gold)">Edit</button>
+        <button onclick="deleteUser('${u.id||u.uuid}')" class="btn btn-sm" style="background:rgba(240,85,101,.1);border:1px solid rgba(240,85,101,.3);color:var(--red)">Del</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+/* User modal */
+function openAddUser() {
+  document.getElementById('uModalTitle').textContent = 'Add New User';
+  document.getElementById('uModalSub').textContent   = 'Fill in the profile details below';
+  document.getElementById('uId').value   = '';
+  document.getElementById('uFn').value   = '';
+  document.getElementById('uLn').value   = '';
+  document.getElementById('uEmail').value = '';
+  document.getElementById('uPhone').value = '';
+  document.getElementById('uPass').value  = '';
+  document.getElementById('userModal').style.display = 'flex';
+}
+
+function openEditUser(u) {
+  document.getElementById('uModalTitle').textContent = 'Edit User';
+  document.getElementById('uModalSub').textContent   = `Editing: ${u.first_name} ${u.last_name}`;
+  document.getElementById('uId').value      = u.id || u.uuid || '';
+  document.getElementById('uFn').value      = u.first_name || '';
+  document.getElementById('uLn').value      = u.last_name  || '';
+  document.getElementById('uEmail').value   = u.email      || '';
+  document.getElementById('uPhone').value   = u.phone      || '';
+  document.getElementById('uStatus').value  = u.status     || 'active';
+  document.getElementById('uRole').value    = u.role       || 'user';
+  document.getElementById('uKyc').value     = u.kyc_status || 'none';
+  document.getElementById('uCountry').value = u.country    || '';
+  document.getElementById('uPass').value    = '';
+  document.getElementById('userModal').style.display = 'flex';
+}
+
+async function saveUser() {
+  const id    = document.getElementById('uId').value;
+  const fn    = document.getElementById('uFn').value.trim();
+  const ln    = document.getElementById('uLn').value.trim();
+  const email = document.getElementById('uEmail').value.trim();
+  if (!fn || !ln || !email) { showToast('Name and email are required', 'error'); return; }
+  const payload = {
+    user_id:    id || undefined,
+    first_name: fn, last_name: ln, email,
+    phone:    document.getElementById('uPhone').value,
+    country:  document.getElementById('uCountry').value,
+    status:   document.getElementById('uStatus').value,
+    role:     document.getElementById('uRole').value,
+    kyc_status: document.getElementById('uKyc').value,
+  };
+  if (id) {
+    const d = await api('/admin.php?action=update_user', 'POST', payload);
+    if (d?.success) { showToast('User updated', 'success'); } else { showToast(d?.error || ('Error'), 'info'); }
+    // Local fallback
+    saveLocalUser({ ...payload, id, uuid: id });
+  } else {
+    // Add new user locally (in demo) or via register API
+    const newUser = { ...payload, id: 'u' + Date.now(), uuid: 'u' + Date.now(), created_at: new Date().toISOString(), usd_balance: 0, experience: 'beginner' };
+    const local = getLocalUsers();
+    local.unshift(newUser);
+    localStorage.setItem('rcm_users', JSON.stringify(local));
+    showToast('User added', 'success');
+  }
+  closeModal('userModal');
+  loadUsers();
+}
+
+async function deleteUser(id) {
+  if (!confirm('Delete this user? This cannot be undone.')) return;
+  const d = await api('/admin.php?action=delete_user', 'POST', { user_id: id });
+  if (d?.success) {
+    const local = getLocalUsers().filter(u => String(u.id) !== String(id) && u.uuid !== String(id));
+    localStorage.setItem('rcm_users', JSON.stringify(local));
+    showToast('User deleted', 'info');
+    loadUsers();
+  } else {
+    showToast(d?.error || 'Error deleting user', 'error');
+  }
+}
+
+/* View profile modal */
+function viewProfile(u) {
+  currentProfileId = u.id || u.uuid;
+  document.getElementById('pAvatar').textContent = (u.first_name[0]||'?') + (u.last_name[0]||'?');
+  document.getElementById('pName').textContent   = u.first_name + ' ' + u.last_name;
+  document.getElementById('pEmail').textContent  = u.email + ' · ' + (u.role||'user');
+  const rows = [
+    ['Account UUID',   u.uuid || u.id],
+    ['Email',          u.email],
+    ['Phone',          u.phone || 'Not provided'],
+    ['Country',        u.country || 'Unknown'],
+    ['USD Balance',    `<strong style="color:var(--gold);font-family:var(--font-mono)">$${Number(u.usd_balance||u.balance||0).toLocaleString()}</strong>`],
+    ['KYC',            kycChip(u.kyc_status||'none')],
+    ['Status',         statusChip(u.status||'active')],
+    ['Member Since',   (u.created_at||u.joined||'').substring(0,10)],
+    ['Last Login',     (u.last_login_at||'Never').substring(0,16)],
+    ['Referral Code',  `<span style="font-family:var(--font-mono);color:var(--gold)">${u.referral_code||'—'}</span>`],
+  ];
+  document.getElementById('pDetails').innerHTML = rows.map(([k,v]) =>
+    `<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);gap:10px"><span style="color:var(--text3);flex-shrink:0">${k}</span><span style="text-align:right">${v}</span></div>`
+  ).join('');
+  document.getElementById('profileModal').style.display = 'flex';
+}
+
+function editFromProfile() {
+  closeModal('profileModal');
+  const u = allUsers.find(x => String(x.id) === String(currentProfileId) || x.uuid === String(currentProfileId));
+  if (u) openEditUser(u);
+}
+
+function setBalFromProfile() {
+  closeModal('profileModal');
+  showPanel('balances', document.querySelector('[onclick*="balances"]'));
+  setTimeout(() => {
+    const sel = document.getElementById('balUserSel');
+    if (sel) sel.value = currentProfileId;
+  }, 150);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Balances
+   ══════════════════════════════════════════════════════════ */
+function loadBalanceUserSelect(users) {
+  const sel = document.getElementById('balUserSel');
+  if (!sel) return;
+  const list = users || allUsers || getLocalUsers();
+  sel.innerHTML = list.map(u => `<option value="${u.id||u.uuid}">${u.first_name} ${u.last_name} — $${Number(u.usd_balance||u.balance||0).toLocaleString()} (${u.email})</option>`).join('');
+}
+
+let balOp = 'set';
+function setOp(op) {
+  balOp = op;
+  ['set','add','subtract'].forEach(o => {
+    const b = document.getElementById('op' + o.charAt(0).toUpperCase() + o.slice(1));
+    if(b) b.classList.toggle('active', o === op);
+  });
+}
+
+async function applyBalance() {
+  const userId   = document.getElementById('balUserSel').value;
+  const amount   = parseFloat(document.getElementById('balAmount').value);
+  const currency = document.getElementById('balCurrency').value;
+  const note     = document.getElementById('balNote').value;
+  if (!userId) { showToast('Select a user', 'error'); return; }
+  if (isNaN(amount) || amount < 0) { showToast('Enter a valid amount', 'error'); return; }
+
+  const d = await api('/admin.php?action=set_balance', 'POST', { user_id: userId, amount, currency, op: balOp, note });
+  const user = (allUsers.length ? allUsers : getLocalUsers()).find(u => String(u.id||u.uuid) === String(userId));
+  const userName = user ? `${user.first_name} ${user.last_name}` : 'User';
+
+  let newBal = amount;
+  if (user && currency === 'USD') {
+    const prev = parseFloat(user.usd_balance || user.balance || 0);
+    if (balOp === 'set')      newBal = amount;
+    else if (balOp === 'add') newBal = prev + amount;
+    else                      newBal = Math.max(0, prev - amount);
+    // Update locally
+    if (user.usd_balance !== undefined) user.usd_balance = newBal;
+    else user.balance = newBal;
+    saveLocalUser(user);
+  }
+
+  // Log
+  const log = JSON.parse(localStorage.getItem('rcm_balance_log') || '[]');
+  log.unshift({ time: new Date().toISOString(), user: userName, op: balOp, amount, currency, newBal, note });
+  localStorage.setItem('rcm_balance_log', JSON.stringify(log.slice(0, 30)));
+  renderBalanceLog();
+
+  showToast(`Balance updated for ${userName}: $${newBal.toLocaleString()}`, 'success');
+  if (d?.success) showToast(d.message, 'success');
+  loadUsers();
+}
+
+function renderBalanceLog() {
+  const log = JSON.parse(localStorage.getItem('rcm_balance_log') || '[]');
+  const el  = document.getElementById('balanceLog');
+  if (!el) return;
+  if (!log.length) { el.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px">No changes yet.</div>'; return; }
+  el.innerHTML = log.map(l => {
+    const col = l.op === 'add' ? 'var(--green)' : l.op === 'subtract' ? 'var(--red)' : 'var(--gold)';
+    const opL  = l.op === 'set' ? 'Set to' : l.op === 'add' ? 'Added' : 'Subtracted';
+    return `<div style="background:var(--surface2);border-radius:8px;padding:12px;border-left:3px solid ${col}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <strong>${l.user}</strong>
+        <span style="font-size:11px;color:var(--text3)">${new Date(l.time).toLocaleString()}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2)">${opL} <strong style="color:${col};font-family:var(--font-mono)">$${Number(l.amount).toLocaleString()} ${l.currency}</strong>  → New balance: <strong style="color:var(--gold);font-family:var(--font-mono)">$${Number(l.newBal).toLocaleString()}</strong></div>
+      ${l.note ? `<div style="font-size:11px;color:var(--text3);margin-top:4px">Note: ${l.note}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function clearBalanceLog() {
+  localStorage.removeItem('rcm_balance_log');
+  renderBalanceLog();
+}
+
+/* ══════════════════════════════════════════════════════════
+   Deposits
+   ══════════════════════════════════════════════════════════ */
+async function loadDeposits() {
+  const d = await api('/admin.php?action=deposits');
+  const body = document.getElementById('depositsBody');
+  const deposits = d?.success ? d.deposits : getLocalNotifs().filter(n => n.type === 'deposit' || n.type === 'payment_intent');
+  document.getElementById('depCount').textContent = deposits.filter(d => (d.status||d.type) === 'pending' || d.type === 'payment_intent').length + ' pending';
+  updateBadge('depBadge', deposits.filter(d => d.status === 'pending' || d.type === 'payment_intent').length);
+  if (!deposits.length) { body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">No deposit requests yet</td></tr>'; return; }
+  body.innerHTML = deposits.map(dep => {
+    const isDB = !!dep.id && !!dep.type && dep.type === 'deposit';
+    const name  = dep.first_name ? dep.first_name + ' ' + dep.last_name : dep.user || 'User';
+    const amt   = dep.amount || 0;
+    const meth  = dep.method || (dep.type === 'payment_intent' ? 'Selecting…' : '—');
+    const date  = (dep.created_at || dep.time || '').substring(0,16);
+    const st    = dep.status || (dep.type === 'payment_intent' ? 'intent' : 'pending');
+    const stChip = st === 'completed' ? '<span class="chip c-green">✓ Approved</span>' : st === 'intent' ? '<span class="chip c-gold">Intent</span>' : '<span class="chip c-blue">⏳ Pending</span>';
+    return `<tr>
+      <td><strong>${name}</strong>${dep.email?`<div style="font-size:11px;color:var(--text3)">${dep.email}</div>`:''}</td>
+      <td class="mono" style="color:var(--green);font-weight:700">$${Number(amt).toLocaleString()}</td>
+      <td>${meth}</td>
+      <td style="color:var(--text3);font-size:11px">${date}</td>
+      <td>${stChip}</td>
+      <td>
+        ${st !== 'completed' ? `<button onclick="approveDeposit('${dep.id||dep.uuid||dep.tx_id||''}', '${name}', ${Number(amt)})" class="btn btn-sm btn-green">Approve</button>` : '<span style="color:var(--text3);font-size:11px">Done</span>'}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function approveDeposit(txId, name, amount) {
+  if (!confirm(`Approve deposit of $${amount.toLocaleString()} for ${name}?`)) return;
+  const d = await api('/admin.php?action=approve_deposit', 'POST', { tx_id: txId });
+  if (d?.success) {
+    showToast(`Deposit approved — $${amount.toLocaleString()} credited to ${name}`, 'success');
+    loadDeposits();
+    loadOverview();
+  } else {
+    showToast(d?.error || 'Error approving deposit', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Withdrawals
+   ══════════════════════════════════════════════════════════ */
+async function loadWithdrawals() {
+  const d = await api('/admin.php?action=withdrawals');
+  const body = document.getElementById('withdrawalsBody');
+  const wds = d?.success ? d.withdrawals : getLocalNotifs().filter(n => n.type === 'withdraw');
+  document.getElementById('wdCount').textContent = wds.filter(w => w.status === 'pending' || !w.status).length + ' pending';
+  updateBadge('wdBadge', wds.filter(w => w.status === 'pending' || !w.status).length);
+  if (!wds.length) { body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3)">No withdrawal requests yet</td></tr>'; return; }
+  body.innerHTML = wds.map(w => {
+    const name = w.first_name ? w.first_name + ' ' + w.last_name : w.user || 'User';
+    const amt  = Math.abs(parseFloat(w.amount || w.amount || 0));
+    const fee  = parseFloat(w.fee || 0);
+    const meth = w.method || '—';
+    const addr = (w.address || '—').substring(0, 22) + ((w.address||'').length > 22 ? '…' : '');
+    const date = (w.created_at || w.time || '').substring(0, 16);
+    const st   = w.status || 'pending';
+    const stChip = st === 'completed' ? '<span class="chip c-green">✓ Done</span>' : st === 'failed' ? '<span class="chip c-red">Failed</span>' : '<span class="chip c-red">⏳ Pending</span>';
+    return `<tr>
+      <td><strong>${name}</strong>${w.email?`<div style="font-size:11px;color:var(--text3)">${w.email}</div>`:''}</td>
+      <td class="mono" style="color:var(--red);font-weight:700">$${amt.toLocaleString()}</td>
+      <td class="mono" style="color:var(--text3)">${fee > 0 ? '$'+fee : 'Free'}</td>
+      <td>${meth}</td>
+      <td class="mono" style="font-size:11px;color:var(--text2)">${addr}</td>
+      <td style="color:var(--text3);font-size:11px">${date}</td>
+      <td>
+        ${st === 'pending' ? `
+          <div style="display:flex;gap:5px">
+            <button onclick="processWithdrawal('${w.id||''}','completed','${name}',${amt})" class="btn btn-sm btn-green">Approve</button>
+            <button onclick="processWithdrawal('${w.id||''}','failed','${name}',${amt})" class="btn btn-sm btn-ghost">Reject</button>
+          </div>` : '<span style="color:var(--text3);font-size:11px">Done</span>'}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function processWithdrawal(txId, status, name, amount) {
+  if (!confirm(`Mark withdrawal of $${amount.toLocaleString()} for ${name} as ${status}?`)) return;
+  const d = await api('/admin.php?action=process_withdrawal', 'POST', { tx_id: txId, status });
+  if (d?.success) {
+    showToast(`Withdrawal ${status === 'completed' ? 'approved' : 'rejected'}`, status === 'completed' ? 'success' : 'info');
+    loadWithdrawals();
+  } else {
+    showToast(d?.error || 'Error', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Messages
+   ══════════════════════════════════════════════════════════ */
+async function loadMessages() {
+  const el = document.getElementById('messagesList');
+  const d  = await api('/admin.php?action=messages');
+  const msgs = d?.success ? d.messages : getLocalNotifs().filter(n => n.type === 'support_message' || n.action === 'support_message');
+  updateBadge('msgBadge', msgs.length);
+  if (!msgs.length) { el.innerHTML = '<div style="color:var(--text3);text-align:center;padding:30px">No messages yet</div>'; return; }
+  el.innerHTML = msgs.map(m => {
+    const name = m.first_name ? m.first_name + ' ' + m.last_name : m.user || 'User';
+    let subject = '—', body = '';
+    try {
+      const det = typeof m.details === 'string' ? JSON.parse(m.details) : (m.details || {});
+      subject = det.subject || m.subject || '—';
+      body    = m.body || '';
+    } catch(e) { subject = m.subject || '—'; body = m.body || ''; }
+    const date = (m.created_at || m.time || '').substring(0, 16);
+    return `<div style="background:var(--surface2);border-radius:12px;padding:16px 18px;border-left:3px solid var(--blue)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px">
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:2px">💬 ${subject}</div>
+          <div style="font-size:12px;color:var(--text3)">From: <strong style="color:var(--text2)">${name}</strong>${m.email?' · '+m.email:''} · ${date}</div>
+        </div>
+        <span class="chip c-blue">Support</span>
+      </div>
+      ${body ? `<div style="background:var(--surface);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6">${body}</div>` : ''}
+      <div style="margin-top:10px;font-size:11px;color:var(--green)">✓ Notification sent to craralph@gmail.com</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════
+   Local Storage Helpers (for demo mode)
+   ══════════════════════════════════════════════════════════ */
+function getLocalNotifs() { return JSON.parse(localStorage.getItem('rcm_admin_notifications') || '[]'); }
+function getLocalUsers()  {
+  const stored = JSON.parse(localStorage.getItem('rcm_users') || '[]');
+  if (stored.length) return stored;
+  // Seed demo data
+  const demo = [
+    { id:'u1', uuid:'u1', first_name:'John',  last_name:'Doe',     email:'john.doe@example.com',  country:'United States', role:'user', status:'active', kyc_status:'approved', usd_balance:24830, experience:'intermediate', created_at:'2024-01-15', referral_code:'JD001' },
+    { id:'u2', uuid:'u2', first_name:'Sarah', last_name:'Chen',    email:'sarah.c@example.com',   country:'United Kingdom', role:'user', status:'active', kyc_status:'approved', usd_balance:87420, experience:'professional', created_at:'2024-02-03', referral_code:'SC002' },
+    { id:'u3', uuid:'u3', first_name:'Mike',  last_name:'Adeyemi', email:'mike.a@example.com',    country:'Nigeria',        role:'user', status:'active', kyc_status:'pending',  usd_balance:5320,  experience:'beginner',     created_at:'2024-02-20', referral_code:'MA003' },
+    { id:'u4', uuid:'u4', first_name:'Emma',  last_name:'Mueller', email:'emma.m@example.com',    country:'Germany',        role:'user', status:'pending',kyc_status:'none',     usd_balance:0,     experience:'some',         created_at:'2024-03-01', referral_code:'EM004' },
+  ];
+  localStorage.setItem('rcm_users', JSON.stringify(demo));
+  return demo;
+}
+function saveLocalUser(u) {
+  const list = getLocalUsers();
+  const idx  = list.findIndex(x => String(x.id) === String(u.id||u.uuid) || x.uuid === String(u.uuid));
+  if (idx > -1) list[idx] = { ...list[idx], ...u };
+  localStorage.setItem('rcm_users', JSON.stringify(list));
+}
+
+/* ══════════════════════════════════════════════════════════
+   UI Helpers
+   ══════════════════════════════════════════════════════════ */
+function statusChip(s) {
+  const m = { active:'<span class="chip c-green">● Active</span>', suspended:'<span class="chip c-gold">● Suspended</span>', banned:'<span class="chip c-red">● Banned</span>', pending:'<span class="chip c-gold">● Pending</span>' };
+  return m[s] || `<span class="chip">${s}</span>`;
+}
+function kycChip(s) {
+  const m = { approved:'<span class="chip c-green">✓ Approved</span>', pending:'<span class="chip c-gold">⏳ Pending</span>', rejected:'<span class="chip c-red">✗ Rejected</span>', none:'<span class="chip" style="color:var(--text3)">None</span>' };
+  return m[s] || `<span class="chip">${s}</span>`;
+}
+
+function updateBadge(id, count) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (count > 0) { el.textContent = count; el.style.display = 'inline'; }
+  else el.style.display = 'none';
+}
+function updateBadges(dep, wd, msg) {
+  updateBadge('depBadge', dep);
+  updateBadge('wdBadge', wd);
+  updateBadge('msgBadge', msg);
+  const total = dep + wd + msg;
+  updateBadge('notifBadge', total);
+  document.getElementById('topNotifDot').style.display = total > 0 ? '' : 'none';
+}
+
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function showToast(msg, type = 'info') {
+  const c     = document.getElementById('toastContainer');
+  const icons = { success:'✅', error:'❌', info:'ℹ️' };
+  const t     = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3400);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Real-time: listen for dashboard activity
+   ══════════════════════════════════════════════════════════ */
+window.addEventListener('storage', e => {
+  if (e.key === 'rcm_admin_notifications') {
+    const notifs = getLocalNotifs();
+    const unread = notifs.filter(n => !n.read).length;
+    updateBadge('notifBadge', unread);
+    document.getElementById('topNotifDot').style.display = unread > 0 ? '' : 'none';
+    const active = document.querySelector('.panel.active')?.id;
+    if (active === 'panel-notifications') loadNotifications();
+    if (active === 'panel-overview')      loadOverview();
+    if (active === 'panel-deposits')      loadDeposits();
+    showToast('New notification received', 'info');
+  }
+});
+
+/* ══════════════════════════════════════════════════════════
+   Init
+   ══════════════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  loadOverview();
+  renderBalanceLog();
+  setInterval(() => {
+    const active = document.querySelector('.panel.active')?.id;
+    if (active === 'panel-notifications') return; // don't auto-refresh if user is viewing
+    loadOverview();
+  }, 30000);
+});
+</script>
+
+<script>
+(function(){
+  /* ── Burger toggle ── */
+  var burger = document.getElementById('rcmBurger');
+  var mobile = document.getElementById('rcmMobile');
+  var header = document.getElementById('rcmHeader');
+  if(burger && mobile){
+    burger.addEventListener('click', function(){
+      var open = mobile.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    // Close on outside click
+    document.addEventListener('click', function(e){
+      if(mobile.classList.contains('open') && !mobile.contains(e.target) && !burger.contains(e.target)){
+        mobile.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+      }
+    });
+    // Close on nav link click
+    mobile.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        mobile.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+  /* ── Scroll shadow ── */
+  if(header){
+    window.addEventListener('scroll', function(){
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, {passive:true});
+  }
+  /* ── Active link highlight ── */
+  var page = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.rcm-links a, .rcm-mobile a').forEach(function(a){
+    if(a.getAttribute('href') === page) a.closest('li') && a.closest('li').classList.add('active');
+  });
+})();
+</script>
+
+</body>
+</html>
